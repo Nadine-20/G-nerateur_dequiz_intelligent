@@ -1,12 +1,31 @@
-# React + Vite
+      First-Time Git Setup
+```bash    
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+       ### Installation
+```bash
+git clone https://github.com/your-org/G-n-rateur-des-Quiz-Intelligent-Groupe-A-.git
+cd G-n-rateur-des-Quiz-Intelligent-Groupe-A-
+npm install
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Creating Your Branch
+git checkout -b components/yourname-component
+# Example:
+# git checkout -b components/ayoub-progress-chart
 
-## Expanding the ESLint configuration
+🚦 Workflow Rules
+Never commit directly to main
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Sync daily:
+
+bash
+git checkout main
+git pull
+git checkout your-branch
+git merge main
+Test before pushing:
+
+bash
+npm run dev
