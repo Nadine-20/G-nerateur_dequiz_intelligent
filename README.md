@@ -89,9 +89,8 @@ npm run dev
 ## 🛠 Stack technique (à adapter si besoin)
 
 - Frontend : React.js
-- UI : Tailwind CSS / Bootstrap
-- Backend : (à préciser)
-- Base de données : (à préciser)
+- Backend : Flask
+- Base de données : MongoDb
 
 ---
 
