@@ -1,0 +1,46 @@
+.progress-dashboard {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.progress-dashboard__title {
+  text-align: center;
+  font-size: 2rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.progress-dashboard__loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.25rem;
+  color: var(--secondary);
+}
+
+.progress-dashboard__details {
+  margin-top: 2rem;
+}
+
+.progress-dashboard__details h3 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.progress-dashboard__details ul {
+  list-style: none;
+  padding-left: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.progress-dashboard__details li {
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #E5E7EB;
+  padding-bottom: 0.3rem;
+}
