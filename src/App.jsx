@@ -2,9 +2,11 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import ResetPassword from './components/auth/ResetPassword';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   return (
     <>
@@ -21,6 +23,12 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
+         <button 
+              onClick={() => setShowResetPassword(true)}
+              style={{ marginTop: '1rem' }}
+            >
+              Afficher la réinitialisation
+            </button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
