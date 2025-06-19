@@ -1,116 +1,167 @@
 import React, { useState } from 'react';
-import './style.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+import './ResetPassword.css';
 
 const ResetPassword = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email || 'votre@email.com';
+  
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isCodeValid, setIsCodeValid] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Gestion des chiffres du code
   const handleDigitChange = (e, index) => {
     const newDigits = [...digits];
-    newDigits[index] = e.target.value.replace(/\D/g, ''); // N'autorise que les chiffres
+    newDigits[index] = e.target.value.replace(/\D/g, '');
     setDigits(newDigits);
 
-    // Focus automatique sur le champ suivant
     if (e.target.value && index < 5) {
       document.getElementById(`digit-${index+1}`).focus();
     }
 
-    // Validation automatique quand tous les chiffres sont saisis
-    if (newDigits.every(d => d !== '') && !isCodeValid) {
+    if (newDigits.every(d => d !== '')) {
       setIsCodeValid(true);
     }
   };
 
-  // Réinitialisation complète
-  const handleCancel = () => {
-    setDigits(['', '', '', '', '', '']);
-    setPassword('');
-    setIsCodeValid(false);
-    
-    // Remet le focus sur le premier champ
-    document.getElementById('digit-0')?.focus();
+  const validatePasswords = () => {
+    if (password !== confirmPassword) {
+      setPasswordError('Les mots de passe ne correspondent pas');
+      return false;
+    }
+    setPasswordError('');
+    return true;
   };
 
-  // Validation du mot de passe
-  const passwordRules = {
+  const passwordChecks = {
     minuscule: /[a-z]/.test(password),
     majuscule: /[A-Z]/.test(password),
     chiffre: /[0-9]/.test(password),
-    longueur: password.length >= 8
+    longueur: password.length >= 8,
+    confirmation: password === confirmPassword && confirmPassword !== ''
   };
 
-  const isPasswordValid = Object.values(passwordRules).every(Boolean);
+  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validatePasswords() || !isPasswordValid) return;
+
+    setIsSubmitting(true);
+    try {
+      // Simulation de soumission (remplacez par un appel API réel)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert('Mot de passe réinitialisé avec succès !');
+      navigate('/login');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setDigits(['', '', '', '', '', '']);
+    setPassword('');
+    setConfirmPassword('');
+    setIsCodeValid(false);
+    setPasswordError('');
+    document.getElementById('digit-0')?.focus();
+  };
 
   return (
-    <div className="password-reset-container">
-      <h1>Réinitialisation du mot de passe</h1>
-      <p className="code-instruction">Entrez le code envoyé à votre email</p>
+    <div className="reset-password-container">
+      <div className="reset-password-card">
+        <h2>Réinitialisation du mot de passe</h2>
+        <p className="email-notice">Code envoyé à : <strong>{email}</strong></p>
 
-      {/* Saisie du code à 6 chiffres */}
-      <div className="code-input-container">
-        {digits.map((digit, index) => (
-          <input
-            key={index}
-            id={`digit-${index}`}
-            type="text"
-            maxLength="1"
-            value={digit}
-            onChange={(e) => handleDigitChange(e, index)}
-            className="digit-input"
-            inputMode="numeric"
-            autoFocus={index === 0}
-          />
-        ))}
-      </div>
+        <div className="code-section">
+          <p>Entrez le code à 6 chiffres</p>
+          <div className="code-inputs">
+            {digits.map((digit, index) => (
+              <input
+                key={index}
+                id={`digit-${index}`}
+                type="text"
+                maxLength="1"
+                value={digit}
+                onChange={(e) => handleDigitChange(e, index)}
+                className="digit-input"
+                inputMode="numeric"
+                autoFocus={index === 0}
+                disabled={isSubmitting}
+              />
+            ))}
+          </div>
+        </div>
 
-      {isCodeValid && <p className="code-validation">✅ Code vérifié</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label>Nouveau mot de passe</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="password-input"
+              placeholder="Minimum 8 caractères"
+              disabled={!isCodeValid || isSubmitting}
+              required
+            />
+          </div>
 
-      <div className="divider"></div>
+          <div className="input-group">
+            <label>Confirmez le mot de passe</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              onBlur={validatePasswords}
+              className={`password-input ${passwordError && 'input-error'}`}
+              placeholder="Retapez votre mot de passe"
+              disabled={!isCodeValid || isSubmitting}
+              required
+            />
+            {passwordError && <p className="error-message">{passwordError}</p>}
+          </div>
 
-      {/* Saisie du nouveau mot de passe */}
-      <p className="password-label">Nouveau mot de passe</p>
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="password-input"
-        placeholder="Saisissez votre nouveau mot de passe"
-      />
+          <div className="password-rules">
+            <p className={passwordChecks.minuscule ? 'rule-valid' : 'rule-invalid'}>
+              {passwordChecks.minuscule ? '✓' : '✗'} Minuscule
+            </p>
+            <p className={passwordChecks.majuscule ? 'rule-valid' : 'rule-invalid'}>
+              {passwordChecks.majuscule ? '✓' : '✗'} Majuscule
+            </p>
+            <p className={passwordChecks.chiffre ? 'rule-valid' : 'rule-invalid'}>
+              {passwordChecks.chiffre ? '✓' : '✗'} Chiffre
+            </p>
+            <p className={passwordChecks.longueur ? 'rule-valid' : 'rule-invalid'}>
+              {passwordChecks.longueur ? '✓' : '✗'} 8+ caractères
+            </p>
+            <p className={passwordChecks.confirmation ? 'rule-valid' : 'rule-invalid'}>
+              {passwordChecks.confirmation ? '✓' : '✗'} Correspondance
+            </p>
+          </div>
 
-      {/* Règles de validation */}
-      <div className="password-rules">
-        <p className={passwordRules.minuscule ? 'rule-valid' : 'rule-invalid'}>
-          {passwordRules.minuscule ? '✓' : '✗'} Au moins une lettre minuscule
-        </p>
-        <p className={passwordRules.longueur ? 'rule-valid' : 'rule-invalid'}>
-          {passwordRules.longueur ? '✓' : '✗'} Minimum 8 caractères
-        </p>
-        <p className={passwordRules.majuscule ? 'rule-valid' : 'rule-invalid'}>
-          {passwordRules.majuscule ? '✓' : '✗'} Au moins une lettre majuscule
-        </p>
-        <p className={passwordRules.chiffre ? 'rule-valid' : 'rule-invalid'}>
-          {passwordRules.chiffre ? '✓' : '✗'} Au moins un chiffre
-        </p>
-      </div>
-
-      {/* Boutons d'action */}
-      <div className="action-buttons">
-        <button 
-          className="cancel-button"
-          onClick={handleCancel}
-          type="button"
-        >
-          Annuler
-        </button>
-        <button 
-          className="reset-button" 
-          disabled={!isPasswordValid}
-          type="submit"
-        >
-          Réinitialiser
-        </button>
+          <div className="action-buttons">
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={!isPasswordValid || isSubmitting}
+            >
+              {isSubmitting ? 'Traitement...' : 'Réinitialiser'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
