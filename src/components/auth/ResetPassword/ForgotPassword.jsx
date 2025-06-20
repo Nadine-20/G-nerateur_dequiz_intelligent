@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -8,19 +8,22 @@ const ForgotPassword = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      // Simulation d'envoi d'email (remplacez par un appel API réel)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (!email.includes('@')) {
+      if (!validateEmail(email)) {
         throw new Error('Email invalide');
       }
 
+      await new Promise(resolve => setTimeout(resolve, 1000));
       alert(`Un code de réinitialisation a été envoyé à ${email}`);
       navigate('/reset-password', { state: { email } });
     } catch (err) {
@@ -64,7 +67,7 @@ const ForgotPassword = () => {
         </form>
 
         <p className="back-to-login">
-          <a href="/login">← Retour à la connexion</a>
+          <Link to="/login">← Retour à la connexion</Link>
         </p>
       </div>
     </div>

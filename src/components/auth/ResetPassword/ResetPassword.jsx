@@ -6,25 +6,32 @@ const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const email = location.state?.email || 'votre@email.com';
-  
+
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isCodeValid, setIsCodeValid] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleDigitChange = (e, index) => {
+    const val = e.target.value.replace(/\D/g, '');
+    if (!val) return;
     const newDigits = [...digits];
-    newDigits[index] = e.target.value.replace(/\D/g, '');
+    newDigits[index] = val;
     setDigits(newDigits);
 
-    if (e.target.value && index < 5) {
-      document.getElementById(`digit-${index+1}`).focus();
+    if (index < 5) {
+      document.getElementById(`digit-${index + 1}`)?.focus();
     }
 
-    if (newDigits.every(d => d !== '')) {
-      setIsCodeValid(true);
+    setIsCodeValid(newDigits.every(d => d !== ''));
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && digits[index] === '' && index > 0) {
+      document.getElementById(`digit-${index - 1}`)?.focus();
     }
   };
 
@@ -53,7 +60,6 @@ const ResetPassword = () => {
 
     setIsSubmitting(true);
     try {
-      // Simulation de soumission (remplacez par un appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
       alert('Mot de passe réinitialisé avec succès !');
       navigate('/login');
@@ -88,10 +94,12 @@ const ResetPassword = () => {
                 maxLength="1"
                 value={digit}
                 onChange={(e) => handleDigitChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
                 className="digit-input"
                 inputMode="numeric"
                 autoFocus={index === 0}
                 disabled={isSubmitting}
+                aria-label={`Chiffre ${index + 1}`}
               />
             ))}
           </div>
@@ -100,21 +108,31 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label>Nouveau mot de passe</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="password-input"
-              placeholder="Minimum 8 caractères"
-              disabled={!isCodeValid || isSubmitting}
-              required
-            />
+            <div className="password-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="password-input"
+                placeholder="Minimum 8 caractères"
+                disabled={!isCodeValid || isSubmitting}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="toggle-password"
+                aria-label={showPassword ? "Masquer" : "Afficher"}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           <div className="input-group">
             <label>Confirmez le mot de passe</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               onBlur={validatePasswords}
@@ -139,8 +157,16 @@ const ResetPassword = () => {
             <p className={passwordChecks.longueur ? 'rule-valid' : 'rule-invalid'}>
               {passwordChecks.longueur ? '✓' : '✗'} 8+ caractères
             </p>
-            <p className={passwordChecks.confirmation ? 'rule-valid' : 'rule-invalid'}>
-              {passwordChecks.confirmation ? '✓' : '✗'} Correspondance
+            <p className={
+              confirmPassword === ''
+                ? 'rule-waiting'
+                : passwordChecks.confirmation
+                  ? 'rule-valid'
+                  : 'rule-invalid'
+            }>
+              {confirmPassword === ''
+                ? '…'
+                : passwordChecks.confirmation ? '✓' : '✗'} Correspondance
             </p>
           </div>
 
