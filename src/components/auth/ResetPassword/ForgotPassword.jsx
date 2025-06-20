@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
+=======
+import { useNavigate, Link } from 'react-router-dom';
+>>>>>>> feature/reset-password
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -8,12 +12,21 @@ const ForgotPassword = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+<<<<<<< HEAD
+=======
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+>>>>>>> feature/reset-password
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
+<<<<<<< HEAD
       // Simulation d'envoi d'email (remplacez par un appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -21,6 +34,13 @@ const ForgotPassword = () => {
         throw new Error('Email invalide');
       }
 
+=======
+      if (!validateEmail(email)) {
+        throw new Error('Email invalide');
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+>>>>>>> feature/reset-password
       alert(`Un code de réinitialisation a été envoyé à ${email}`);
       navigate('/reset-password', { state: { email } });
     } catch (err) {
@@ -64,11 +84,19 @@ const ForgotPassword = () => {
         </form>
 
         <p className="back-to-login">
+<<<<<<< HEAD
           <a href="/login">← Retour à la connexion</a>
+=======
+          <Link to="/login">← Retour à la connexion</Link>
+>>>>>>> feature/reset-password
         </p>
       </div>
     </div>
   );
 };
 
+<<<<<<< HEAD
 export default ForgotPassword;
+=======
+export default ForgotPassword;
+>>>>>>> feature/reset-password
