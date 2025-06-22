@@ -1,12 +1,12 @@
 import React from 'react'
-import EditProfilePage from './pages/EditProfilePage'
 import NavBar from './components/navbar/NavBar'
+import AllRoutes from './routes/AllRoutes'
 
 function App() {
   return (
     <>
       <NavBar />
-      <EditProfilePage />
+      <AllRoutes />
     </>
   )
 }

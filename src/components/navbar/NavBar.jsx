@@ -9,7 +9,7 @@ function NavBar() {
     const userInfo = {
         userName: "JohnDoe",
         email: "john@example.com",
-        role: "admin" // can be "admin", "teacher", or "student"
+        role: "student" // can be "admin", "teacher", or "student"
     };
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -137,7 +137,7 @@ function NavBar() {
 
                                     {/* Common links for all roles */}
                                     <Link
-                                        to='/profile'
+                                        to='/edit-profile'
                                         className="dropdown-item"
                                         onClick={closeDropdown}
                                     >

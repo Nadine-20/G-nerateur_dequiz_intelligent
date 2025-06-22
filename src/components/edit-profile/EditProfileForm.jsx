@@ -65,21 +65,18 @@ function EditProfileForm({ user }) {
         <div className="edit-profile-container">
             <h2 className="edit-profile-title">Edit Profile</h2>
             <form className="edit-profile-form" onSubmit={handleSubmit}>
-                <div className="profile-picture-section">
-                    <div className="profile-picture-wrapper">
-                        <div className="profile-picture-frame">
+                <div className="profile-section">
+                    <div className="profile-image-wrapper">
+                        <div className="profile-image-container">
                             <img
                                 src={previewImage}
                                 alt="Profile"
-                                className="profile-picture"
-                                onError={(e) => {
-                                    e.target.src = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
-                                }}
+                                className="profile-image"
                             />
-                            <div className="profile-picture-overlay">
+                            <div className="profile-image-overlay">
                                 <button
                                     type="button"
-                                    className="change-photo-btn"
+                                    className="change-image-btn"
                                     onClick={triggerFileInput}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -100,55 +97,48 @@ function EditProfileForm({ user }) {
                     </div>
                 </div>
 
-                <div className="form-grid">
-                    <div className="form-group">
-                        <label htmlFor="userName" className="form-label">Username</label>
+                <div className="form-fields-grid">
+                    <div className="form-field-group">
+                        <label htmlFor="userName" className="form-field-label">Username</label>
                         <input
                             type="text"
                             id="userName"
                             name="userName"
                             value={formData.userName}
                             onChange={handleChange}
-                            className="form-input"
+                            className="form-field-input"
                             placeholder="Enter your username"
                         />
                     </div>
-
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">Email Address</label>
+                    <div className="form-field-group">
+                        <label htmlFor="email" className="form-field-label">Email Address</label>
                         <input
                             type="email"
                             id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="form-input"
+                            className="form-field-input"
                             placeholder="Enter your email"
                             disabled
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="role" className="form-label">Role</label>
-                        <div className="form-select-wrapper">
-                            <select
-                                id="role"
-                                name="role"
-                                value={user?.role || ''}
-                                className="form-select"
-                                disabled
-                            >
-                                <option value="">{user?.role || 'user role'}</option>
-                            </select>
-                            <div className="select-arrow"></div>
-                        </div>
+                    <div className="form-field-group">
+                        <label htmlFor="role" className="form-field-label">Role</label>
+                        <input
+                            type="text"
+                            className="form-field-input"
+                            value={user?.role || 'user role'}
+                            disabled
+                        />
                     </div>
                 </div>
 
-                <div className="password-change-section">
+                <div className="password-section">
                     <button
                         type="button"
-                        className="change-password-link"
+                        className="change-password-btn"
                         onClick={togglePasswordFields}
                     >
                         {showPasswordFields ? (
@@ -169,61 +159,55 @@ function EditProfileForm({ user }) {
                     </button>
 
                     {showPasswordFields && (
-                        <div className="password-fields">
-                            <div className="form-group">
-                                <label htmlFor="currentPassword" className="form-label">Current Password</label>
-                                <div className="password-input-wrapper">
-                                    <input
-                                        type="password"
-                                        id="currentPassword"
-                                        name="currentPassword"
-                                        value={formData.currentPassword}
-                                        onChange={handleChange}
-                                        className="form-input"
-                                        placeholder="Enter current password"
-                                        required
-                                    />
-                                </div>
+                        <div className="password-fields-group">
+                            <div className="form-field-group">
+                                <label htmlFor="currentPassword" className="form-field-label">Current Password</label>
+                                <input
+                                    type="password"
+                                    id="currentPassword"
+                                    name="currentPassword"
+                                    value={formData.currentPassword}
+                                    onChange={handleChange}
+                                    className="form-field-input"
+                                    placeholder="Enter current password"
+                                    required
+                                />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="newPassword" className="form-label">New Password</label>
-                                <div className="password-input-wrapper">
-                                    <input
-                                        type="password"
-                                        id="newPassword"
-                                        name="newPassword"
-                                        value={formData.newPassword}
-                                        onChange={handleChange}
-                                        className="form-input"
-                                        placeholder="Enter new password"
-                                        required
-                                    />
-                                </div>
+                            <div className="form-field-group">
+                                <label htmlFor="newPassword" className="form-field-label">New Password</label>
+                                <input
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPassword"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                    className="form-field-input"
+                                    placeholder="Enter new password"
+                                    required
+                                />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
-                                <div className="password-input-wrapper">
-                                    <input
-                                        type="password"
-                                        id="confirmPassword"
-                                        name="confirmPassword"
-                                        value={formData.confirmPassword}
-                                        onChange={handleChange}
-                                        className="form-input"
-                                        placeholder="Confirm new password"
-                                        required
-                                    />
-                                </div>
+                            <div className="form-field-group">
+                                <label htmlFor="confirmPassword" className="form-field-label">Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className="form-field-input"
+                                    placeholder="Confirm new password"
+                                    required
+                                />
                             </div>
                         </div>
                     )}
                 </div>
 
-                <div className="form-actions">
-                    <button type="button" className="cancel-btn">
+                <div className="form-actions-group">
+                    <button type="button" className="cancel-form-btn">
                         Cancel
                     </button>
-                    <button type="submit" className="save-btn">
+                    <button type="submit" className="submit-form-btn">
                         Save Changes
                     </button>
                 </div>
