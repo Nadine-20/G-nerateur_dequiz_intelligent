@@ -1,0 +1,174 @@
+.navigation-container {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    background-color: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(55, 65, 81, 1);
+    width: 30%;
+    min-width: 150px;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
+}
+
+.navigation-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left-nav-items {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.right-nav-container {
+    position: relative;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #60a5fa;
+}
+
+.nav-icon {
+    color: white;
+    transition: color 0.3s;
+}
+
+.nav-link:hover .nav-icon {
+    color: #60a5fa;
+}
+
+.nav-text {
+    margin-left: 0.5rem;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .nav-text {
+        display: inline;
+    }
+}
+
+.user-nav-items {
+    display: flex;
+    align-items: center;
+}
+
+.user-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    color: white;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background-color: #2563eb;
+    margin-right: 0.5rem;
+}
+
+.avatar-icon {
+    color: white;
+}
+
+.username {
+    color: white;
+    margin-right: 0.5rem;
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .username {
+        display: inline;
+    }
+}
+
+.dropdown-icon {
+    color: rgba(209, 213, 219, 1);
+    transition: color 0.2s;
+}
+
+.user-button:hover .dropdown-icon {
+    color: white;
+}
+
+.dropdown-menu {
+    position: absolute;
+    bottom: 100%;
+    margin-top: 0.75rem;
+    width: 14rem;
+    background-color: rgba(31, 41, 55, 1);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 0;
+    border: 1px solid rgba(55, 65, 81, 1);
+    z-index: 50;
+}
+
+.dropdown-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(55, 65, 81, 1);
+}
+
+.dropdown-username {
+    font-size: 0.875rem;
+    color: white;
+    font-weight: 500;
+}
+
+.dropdown-email {
+    font-size: 0.75rem;
+    color: rgba(156, 163, 175, 1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dropdown-role{
+    color: #FFFFFF;
+}
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: rgba(209, 213, 219, 1);
+    text-decoration: none;
+    transition: background-color 0.2s;
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(55, 65, 81, 1);
+}
+
+.logout-button {
+    color: rgba(209, 213, 219, 1);
+}
+
+.auth-nav-items {
+    display: flex;
+    gap: 1rem;
+}
