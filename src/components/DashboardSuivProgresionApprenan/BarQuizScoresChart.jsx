@@ -23,7 +23,7 @@ function BarQuizScoresChart() {
     const ctx = chart.ctx;
     const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
     gradientFill.addColorStop(0, "rgba(34, 197, 94, 0.9)"); // Vert vif (var(--accent))
-    gradientFill.addColorStop(1, "rgba(99, 102, 241, 0.7)"); // Bleu doux (var(--secondary))
+    gradientFill.addColorStop(1, "rgba(99, 102, 241, 0.7)"); // Bleu doux (var(--secondary)
 
     setGradient(gradientFill);
   }, []);
