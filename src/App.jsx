@@ -1,8 +1,14 @@
-import React from 'react';
-import ApprenantDashboard from './Home';
+import React from 'react'
+import NavBar from './components/navbar/NavBar'
+import AllRoutes from './routes/AllRoutes'
 
 function App() {
-  return <ApprenantDashboard />;
+  return (
+    <>
+      <NavBar />
+      <AllRoutes />
+    </>
+  )
 }
 
-export default App;
+export default App
