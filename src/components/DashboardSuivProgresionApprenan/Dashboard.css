@@ -15,6 +15,14 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg);
@@ -24,8 +32,10 @@ body {
 /* Container global du dashboard */
 .dashboard-container {
   padding: 2rem 1rem;
+  padding-bottom: 4rem; /* ajout pour espace en bas */
   max-width: 1200px;
   margin: 0 auto;
+  /* pas de hauteur fixe ici */
 }
 
 /* Section titre */
@@ -56,7 +66,8 @@ body {
   box-shadow: 0 4px 12px var(--shadow);
   transition: transform 0.2s ease;
   width: 100%;
-  max-width: 500px;
+  max-width: 900px;
+  /* pas de hauteur fixe ni overflow caché */
 }
 
 .chart-card:hover {

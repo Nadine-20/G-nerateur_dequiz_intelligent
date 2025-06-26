@@ -90,7 +90,17 @@ function BarQuizScoresChart() {
     },
   };
 
-  return <Bar ref={chartRef} data={data} options={options} />;
+  return<> 
+  <div>
+        <Bar
+          ref={chartRef}
+          data={data}
+          options={options}/>
+      </div>
+      <br></br>
+      <br></br>
+      <br></br></>
+      
 }
 
 export default BarQuizScoresChart;

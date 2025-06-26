@@ -68,7 +68,7 @@ function RadarSkillsChart() {
   };
 
   return (
-    <div style={{ width: '100%', height: '350px', maxWidth: '450px', margin: 'auto' }}>
+    <div style={{ width: '100%', height: '350px', maxWidth: '600px', margin: 'auto' }}>
       <Radar data={data} options={options} />
     </div>
   );

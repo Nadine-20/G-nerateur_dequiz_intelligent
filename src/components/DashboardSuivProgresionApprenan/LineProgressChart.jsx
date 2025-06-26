@@ -108,7 +108,17 @@ function LineProgressChart() {
     },
   };
 
-  return <Line ref={chartRef} data={data} options={options} />;
+  return <> 
+    <div>
+          <Line
+            ref={chartRef}
+            data={data}
+            options={options}/>
+        </div>
+        <br></br>
+        <br></br>
+      
+        </>;
 }
 
 export default LineProgressChart;

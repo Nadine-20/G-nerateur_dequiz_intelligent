@@ -10,7 +10,6 @@ export default function DoughnutSuccessChart() {
   const [gradient, setGradient] = useState(null);
   const { completed, remaining } = successData;
 
-  // Appel des hooks en premier, toujours
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart) return;
@@ -23,7 +22,6 @@ export default function DoughnutSuccessChart() {
     setGradient(gradientFill);
   }, []);
 
-  // Condition après les hooks, dans le rendu
   if (completed === undefined || remaining === undefined) {
     return <p style={{ textAlign: "center" }}>Données non disponibles</p>;
   }
@@ -44,6 +42,7 @@ export default function DoughnutSuccessChart() {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,  // Important pour remplir le container
     cutout: "70%",
     animation: {
       duration: 1200,
@@ -72,12 +71,26 @@ export default function DoughnutSuccessChart() {
     <div
       style={{
         width: "100%",
-        maxWidth: 400,
-        height: 300,
+        maxWidth: 600,  // largeur max plus grande
+        height: 450,    // hauteur plus grande
         margin: "auto",
       }}
     >
-      <Doughnut ref={chartRef} data={data} options={options} />
+      <Doughnut
+        ref={chartRef}
+        data={data}
+        options={options}
+        width={600}
+        height={450}
+      />
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
     </div>
+    
   );
 }
