@@ -1,101 +1,70 @@
-# 🧠 Générateur de Quiz Intelligent – Groupe A
+# Getting Started with Create React App
 
-Bienvenue dans le projet du générateur de quiz intelligent du Groupe A. Ce document vous guide pour configurer votre environnement, suivre les bonnes pratiques Git, et contribuer efficacement.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
----
+## Available Scripts
 
-## 🔧 Première configuration de Git
+In the project directory, you can run:
 
-Avant de commencer, assurez-vous de configurer votre identité Git si ce n’est pas encore fait :
+### `npm start`
 
-```bash
-git config --global user.name "Votre Nom"
-git config --global user.email "votre.email@example.com"
-```
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
----
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-## 📥 Installation du projet
+### `npm test`
 
-Pour installer et démarrer le projet en local :
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-```bash
-git clone https://github.com/your-org/G-n-rateur-des-Quiz-Intelligent-Groupe-A-.git
-cd G-n-rateur-des-Quiz-Intelligent-Groupe-A-
-npm install
-```
+### `npm run build`
 
----
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## 🌿 Création de votre branche
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-Travaillez toujours dans une branche dédiée à votre composant ou tâche. Suivez le nommage suivant :
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```bash
-git checkout -b components/votre-nom-composant
-```
+### `npm run eject`
 
-🔹 **Exemple** :
-```bash
-git checkout -b components/ayoub-progress-chart
-```
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
----
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-## 🚦 Règles de Workflow Git
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-### ❌ Ne jamais committer directement sur `main`
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Toutes les modifications doivent passer par une branche dédiée et une Pull Request.
+## Learn More
 
----
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### 🔄 Synchronisation quotidienne avec `main`
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-Avant de continuer le développement chaque jour, synchronisez votre branche avec les dernières modifications :
+### Code Splitting
 
-```bash
-git checkout main
-git pull
-git checkout votre-branche
-git merge main
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
----
+### Analyzing the Bundle Size
 
-### 🧪 Tester votre code avant de pousser
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-Toujours vérifier que votre code fonctionne correctement avant de le pousser :
+### Making a Progressive Web App
 
-```bash
-npm run dev
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
----
+### Advanced Configuration
 
-## ✅ Bonnes pratiques Git
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-- Créez des branches claires et bien nommées.
-- Écrivez des messages de commit descriptifs.
-- Faites des commits atomiques (petits et précis).
-- Utilisez :
-  ```bash
-  git push origin votre-branche
-  ```
-- Ouvrez une **Pull Request** pour toute fusion dans `main`.
+### Deployment
 
----
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-## 🛠 Stack technique (à adapter si besoin)
+### `npm run build` fails to minify
 
-- Frontend : React.js
-- Backend : Flask
-- Base de données : MongoDb
-
----
-
-## 📚 Contribution
-
-Pour toute question ou suggestion, contactez moi "ayoub ben hamada" ou ouvrez une **issue** sur GitHub.
-
-Merci de contribuer au projet 🎉
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

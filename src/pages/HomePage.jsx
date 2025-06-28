@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import ApprenantDashboard from '../components/apprenantDashboard/Home';
 
 function HomePage() {
     return (
-        <div>HomePage</div>
-    )
+        <ApprenantDashboard />
+    );
 }
 
-export default HomePage
+export default HomePage;

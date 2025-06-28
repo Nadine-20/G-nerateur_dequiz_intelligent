@@ -1,6 +1,6 @@
-import React from 'react'
-import NavBar from './components/navbar/NavBar'
-import AllRoutes from './routes/AllRoutes'
+import React from 'react';
+import NavBar from './components/navbar/NavBar';
+import AllRoutes from './routes/AllRoutes';
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <NavBar />
       <AllRoutes />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

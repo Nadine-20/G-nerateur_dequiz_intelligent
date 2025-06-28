@@ -10,6 +10,7 @@ function NavBar() {
         userName: "JohnDoe",
         email: "john@example.com",
         role: "student" // can be "admin", "teacher", or "student"
+
     };
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
