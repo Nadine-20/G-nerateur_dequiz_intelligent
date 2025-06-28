@@ -1,5 +1,7 @@
+import React from 'react';
 import NavBar from './components/navbar/NavBar';
 import AllRoutes from './routes/AllRoutes';
+
 function App() {
   return (
     <>
@@ -9,4 +11,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
