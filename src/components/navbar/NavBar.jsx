@@ -8,9 +8,10 @@ import { FiChevronDown, FiUser, FiX } from 'react-icons/fi';
 function NavBar() {
     const userInfo = {
         userName: "JohnDoe",
+        firstName: "first name",
+        lastName: "last name",
         email: "john@example.com",
-        role: "teacher" // can be "admin", "teacher", or "student"
-
+        role: "student" // can be "admin", "teacher", or "student"
     };
 
     const [dropdownOpen, setDropdownOpen] = useState(false);

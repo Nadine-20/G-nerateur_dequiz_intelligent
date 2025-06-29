@@ -6,6 +6,8 @@ function EditProfilePage() {
 
     const userInfo = {
         userName: "test",
+        firstName:"first name",
+        lastName:"last name",
         email: "test@gmail.com",
         role: "Enseignant"
     }

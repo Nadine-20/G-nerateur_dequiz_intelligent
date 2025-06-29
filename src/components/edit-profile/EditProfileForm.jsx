@@ -4,6 +4,8 @@ import './editProfile.css';
 function EditProfileForm({ user }) {
     const [formData, setFormData] = useState({
         userName: user?.userName || '',
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
         email: user?.email || '',
         profilePicture: user?.profilePicture || null,
         currentPassword: '',
@@ -58,7 +60,8 @@ function EditProfileForm({ user }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Add your logic for edit here
+        // Add your form submission logic here
+        console.log('Form submitted:', formData);
     };
 
     return (
@@ -111,6 +114,30 @@ function EditProfileForm({ user }) {
                         />
                     </div>
                     <div className="form-field-group">
+                        <label htmlFor="firstName" className="form-field-label">First Name</label>
+                        <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            className="form-field-input"
+                            placeholder="Enter your first name"
+                        />
+                    </div>
+                    <div className="form-field-group">
+                        <label htmlFor="lastName" className="form-field-label">Last Name</label>
+                        <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            className="form-field-input"
+                            placeholder="Enter your last name"
+                        />
+                    </div>
+                    <div className="form-field-group">
                         <label htmlFor="email" className="form-field-label">Email Address</label>
                         <input
                             type="email"
@@ -123,7 +150,6 @@ function EditProfileForm({ user }) {
                             disabled
                         />
                     </div>
-
                     <div className="form-field-group">
                         <label htmlFor="role" className="form-field-label">Role</label>
                         <input
