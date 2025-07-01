@@ -3,7 +3,6 @@ import './editProfile.css';
 
 function EditProfileForm({ user }) {
     const [formData, setFormData] = useState({
-        userName: user?.userName || '',
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
         email: user?.email || '',
@@ -101,18 +100,6 @@ function EditProfileForm({ user }) {
                 </div>
 
                 <div className="form-fields-grid">
-                    <div className="form-field-group">
-                        <label htmlFor="userName" className="form-field-label">Username</label>
-                        <input
-                            type="text"
-                            id="userName"
-                            name="userName"
-                            value={formData.userName}
-                            onChange={handleChange}
-                            className="form-field-input"
-                            placeholder="Enter your username"
-                        />
-                    </div>
                     <div className="form-field-group">
                         <label htmlFor="firstName" className="form-field-label">First Name</label>
                         <input

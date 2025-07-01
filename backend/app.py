@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from controllers.apprenantController import apprenant_bp, init_apprenant_controller
 from controllers.upload_controller import upload_image  
+from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
 
 load_dotenv()
 
@@ -24,6 +25,7 @@ except Exception as e:
 
 # Initialise les contrôleurs avec mongo
 init_apprenant_controller(mongo)
+init_edit_profile_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -31,6 +33,10 @@ app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
 @app.route("/upload", methods=["POST"])
 def handle_upload():
     return upload_image()
+
+@app.route("/api/editProfile", methods=["POST"])
+def handle_edit_profile():
+    return edit_profile()
 
 if __name__ == "__main__":
     app.run(debug=True)
