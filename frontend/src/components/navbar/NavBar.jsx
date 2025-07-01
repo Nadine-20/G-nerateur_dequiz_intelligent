@@ -108,11 +108,11 @@ function NavBar() {
                                                 <span>My Quizzes</span>
                                             </Link>
                                             <Link
-                                                to='/teacher/analytics'
+                                                to='/teacher/dashboard'
                                                 className="dropdown-item"
                                                 onClick={closeDropdown}
                                             >
-                                                <span>Analyze Results</span>
+                                                <span>Dashboard</span>
                                             </Link>
                                         </>
                                     )}
