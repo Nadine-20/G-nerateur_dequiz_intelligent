@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LineProgressChart from "./LineProgressChart";
 import BarQuizScoresChart from "./BarQuizScoresChart";
 import RadarSkillsChart from "./RadarSkillsChart";
@@ -7,14 +7,22 @@ import ProgressDashboard from "./ProgressDashboard";
 import "./Dashboard.css";
 
 function Dashboard() {
-  // Onglet actif - par défaut "line"
   const [activeTab, setActiveTab] = useState("line");
+  const [userId, setUserId] = useState(null);
 
-  // Liste des onglets avec id et label
+  useEffect(() => {
+   const storedUserId = localStorage.getItem("userId") || "user_004";
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
+
+  if (!userId) return <p>Chargement du tableau de bord...</p>;
+
   const tabs = [
     { id: "line", label: "Progression Mensuelle" },
     { id: "bar", label: "Scores Quiz" },
-    { id: "radar", label: "Compétences" },
+    // { id: "radar", label: "Compétences" },
     { id: "progress", label: "Suivi Progression" },
     { id: "doughnut", label: "Succès" },
   ];
@@ -25,7 +33,6 @@ function Dashboard() {
         <h1>Tableau de bord de progression</h1>
       </header>
 
-      {/* Onglets de navigation */}
       <nav className="tabs">
         {tabs.map((tab) => (
           <button
@@ -38,31 +45,30 @@ function Dashboard() {
         ))}
       </nav>
 
-      {/* Contenu des onglets - afficher uniquement celui sélectionné */}
       <div className="dashboard-grid" style={{ justifyContent: "center" }}>
         {activeTab === "line" && (
           <div className="chart-card">
-            <LineProgressChart />
+            <LineProgressChart userId={userId} />
           </div>
         )}
         {activeTab === "bar" && (
           <div className="chart-card">
-            <BarQuizScoresChart />
+            <BarQuizScoresChart userId={userId} />
           </div>
         )}
-        {activeTab === "radar" && (
+     {/*    {activeTab === "radar" && (
           <div className="chart-card">
-            <RadarSkillsChart />
+            <RadarSkillsChart userId={userId} />
           </div>
-        )}
+        )} */}
         {activeTab === "progress" && (
           <div className="chart-card">
-            <ProgressDashboard />
+            <ProgressDashboard userId={userId} />
           </div>
         )}
         {activeTab === "doughnut" && (
           <div className="chart-card">
-            <DoughnutSuccessChart />
+            <DoughnutSuccessChart userId={userId} />
           </div>
         )}
       </div>

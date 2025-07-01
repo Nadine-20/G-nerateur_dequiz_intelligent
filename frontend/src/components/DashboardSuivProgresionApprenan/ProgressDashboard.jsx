@@ -2,33 +2,74 @@ import { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
 } from "recharts";
-
 import "./ProgressDashboard.css";
 
-function ProgressDashboard() {
+function ProgressDashboard({ userId }) {
   const [progressData, setProgressData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = [
-      { quiz: "Quiz 1", score: 60 },
-      { quiz: "Quiz 2", score: 75 },
-      { quiz: "Quiz 3", score: 90 },
-    ];
+    if (!userId) return;
 
-    setProgressData(data);
-    setLoading(false);
-  }, []);
+    async function fetchData() {
+      try {
+        // 1. Récupérer l'historique du user
+        const resProgress = await fetch(`http://localhost:5000/api/apprenant/${userId}/progress`);
+        const dataProgress = await resProgress.json();
+        const history = dataProgress.progress || [];
+
+        if (history.length === 0) {
+          setProgressData([]);
+          setLoading(false);
+          return;
+        }
+
+        // 2. Extraire IDs des quizzes
+        const quizIds = history.map((entry) => entry.quizId);
+
+        // 3. Récupérer uniquement les quizzes demandés
+        const resQuizzes = await fetch(`http://localhost:5000/api/apprenant/quizzes/by-ids`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: quizIds }),
+        });
+        const quizzes = await resQuizzes.json();
+
+        // 4. Créer un dictionnaire id => titre
+        const quizMap = {};
+        quizzes.forEach((quiz) => {
+          quizMap[quiz._id] = quiz.title;
+        });
+
+        // 5. Préparer données pour graphique et liste
+        const formattedData = history.map((entry, idx) => ({
+          quiz: quizMap[entry.quizId] || `Quiz ${idx + 1}`,
+          score: entry.score,
+        }));
+
+        setProgressData(formattedData);
+      } catch (err) {
+        console.error("Erreur récupération progression :", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [userId]);
 
   if (loading) return <div className="progress-dashboard__loading">Chargement...</div>;
+
+  if (progressData.length === 0)
+    return <p style={{ textAlign: "center" }}>Aucune donnée de progression disponible.</p>;
 
   return (
     <div className="progress-dashboard">
       <h2 className="progress-dashboard__title">Suivi de progression</h2>
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart 
-          data={progressData} 
+        <LineChart
+          data={progressData}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           className="progress-chart"
         >
@@ -36,7 +77,12 @@ function ProgressDashboard() {
           <XAxis dataKey="quiz" tick={{ fill: "var(--text)", fontWeight: "600" }} />
           <YAxis tick={{ fill: "var(--text)", fontWeight: "600" }} />
           <Tooltip
-            contentStyle={{ backgroundColor: "#f5f5f5", borderRadius: 8, border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            contentStyle={{
+              backgroundColor: "#f5f5f5",
+              borderRadius: 8,
+              border: "none",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
             itemStyle={{ color: "var(--primary)", fontWeight: "700" }}
           />
           <Line
@@ -57,15 +103,15 @@ function ProgressDashboard() {
         <ul>
           {progressData.map((item, idx) => (
             <li key={idx}>
-              <strong>{item.quiz}</strong> : <span style={{ color: "var(--accent)" }}>{item.score}%</span>
+              <strong>{item.quiz}</strong> :{" "}
+              <span style={{ color: "var(--accent)" }}>{item.score}%</span>
             </li>
           ))}
         </ul>
       </div>
-      <br></br>
-      <br></br> 
+      <br />
+      <br />
     </div>
-    
   );
 }
 

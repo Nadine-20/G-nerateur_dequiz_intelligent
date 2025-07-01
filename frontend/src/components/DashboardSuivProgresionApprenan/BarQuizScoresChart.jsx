@@ -8,32 +8,48 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { quizScores } from "./FakeData";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-function BarQuizScoresChart() {
+function BarQuizScoresChart({ userId }) {
   const chartRef = useRef(null);
   const [gradient, setGradient] = useState(null);
+  const [scores, setScores] = useState([]); // <== DONNÉES DU BACKEND
 
+  // 1. Fetch scores depuis l’API Flask
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`http://localhost:5000/api/apprenant/${userId}/scores`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.scores)) {
+          setScores(data.scores);
+        }
+      })
+      .catch((err) => console.error("Erreur chargement scores:", err));
+  }, [userId]);
+
+  // 2. Générer le dégradé
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart) return;
 
     const ctx = chart.ctx;
     const gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-    gradientFill.addColorStop(0, "rgba(34, 197, 94, 0.9)"); // Vert vif (var(--accent))
-    gradientFill.addColorStop(1, "rgba(99, 102, 241, 0.7)"); // Bleu doux (var(--secondary)
+    gradientFill.addColorStop(0, "rgba(34, 197, 94, 0.9)");
+    gradientFill.addColorStop(1, "rgba(99, 102, 241, 0.7)");
 
     setGradient(gradientFill);
-  }, []);
+  }, [scores]); // important : dépend du chargement des données
 
+  // 3. Construction du graphique avec les scores
   const data = {
-    labels: quizScores.map((item) => item.quiz),
+    labels: scores.map((_, i) => `Essai ${i + 1}`),
     datasets: [
       {
         label: "Score par quiz",
-        data: quizScores.map((item) => item.score),
+        data: scores,
         backgroundColor: gradient || "#22C55E",
         borderRadius: 8,
         maxBarThickness: 40,
@@ -90,17 +106,16 @@ function BarQuizScoresChart() {
     },
   };
 
-  return<> 
-  <div>
-        <Bar
-          ref={chartRef}
-          data={data}
-          options={options}/>
+  return (
+    <>
+      <div>
+        <Bar ref={chartRef} data={data} options={options} />
       </div>
-      <br></br>
-      <br></br>
-      <br></br></>
-      
+      <br />
+      <br />
+      <br />
+    </>
+  );
 }
 
 export default BarQuizScoresChart;
