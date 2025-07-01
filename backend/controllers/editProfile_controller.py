@@ -15,11 +15,15 @@ def edit_profile():
     if not user:
         return jsonify({"message": "User not found"}), 400
 
-    update_data = {
-        "firstName": data.get("firstName"),
-        "lastName": data.get("lastName"),
-        "image": data.get("profilePicture"),
-    }
+    update_data = {}
+
+    if data.get("firstName"):
+        update_data["firstName"] = data.get("firstName")
+    if data.get("lastName"):
+        update_data["lastName"] = data.get("lastName")
+    if data.get("profilePicture"):
+        update_data["image"] = data.get("profilePicture")
+
     if data.get("currentPassword") and data.get("newPassword") and data.get("confirmPassword"):
         if check_password_hash(user["password"], data.get("currentPassword")):
             if data.get("newPassword") == data.get("confirmPassword"):

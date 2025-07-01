@@ -34,7 +34,7 @@ app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
 def handle_upload():
     return upload_image()
 
-@app.route("/api/editProfile", methods=["POST"])
+@app.route("/api/editProfile", methods=["PUT"])
 def handle_edit_profile():
     return edit_profile()
 
