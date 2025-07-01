@@ -10,10 +10,11 @@ class User:
         self.gender = gender
 
 class Student(User):
-    def __init__(self, _id, email, password, firstName, lastName, image, gender, quizHistory, createdAt, customQuizzes):
+    def __init__(self, _id, email, password, firstName, lastName, image, gender, quizHistory, createdAt, customQuizzes,lastConnect):
         super().__init__(_id, email, password, "student", firstName, lastName, image, gender)
         self.quizHistory = quizHistory
         self.createdAt = createdAt
+        self.lastConnect = lastConnect
         self.customQuizzes = customQuizzes
 
 class Teacher(User):
