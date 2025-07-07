@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './ResetPassword.css';
+import { toast } from 'react-toastify';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -62,7 +63,7 @@ const ResetPassword = () => {
     try {
       // Simulation de soumission (remplacez par un appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Mot de passe réinitialisé avec succès !');
+      toast.success('Mot de passe réinitialisé avec succès !');
       navigate('/login');
     } finally {
       setIsSubmitting(false);

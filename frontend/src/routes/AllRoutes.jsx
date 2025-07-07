@@ -6,6 +6,7 @@ import { ResetPassword, ForgotPassword } from '../components/auth/ResetPassword'
 import QuizCreatorPage from '../pages/QuizCreatorPage'
 import DashboardStudent from '../components/DashboardSuivProgresionApprenan/Dashboard'
 import DashboardTeacher from '../components/interface_enseignant/dashboard'
+import Login from '../components/auth/login/Login'
 
 function AllRoutes() {
     return (
@@ -18,6 +19,7 @@ function AllRoutes() {
             <Route path="/teacher/dashboard" element={<DashboardTeacher />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/login" element={<Login />} />
         </Routes>
     )
 }

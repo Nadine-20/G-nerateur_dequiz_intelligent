@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './ForgotPassword.css';
+import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +26,7 @@ const ForgotPassword = () => {
 
       // Simulation d'envoi d'email (remplacez par un appel API réel)
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert(`Un code de réinitialisation a été envoyé à ${email}`);
+      toast.success(`Un code de réinitialisation a été envoyé à ${email}`);
       navigate('/reset-password', { state: { email } });
     } catch (err) {
       setError(err.message || 'Erreur lors de l\'envoi du code');
