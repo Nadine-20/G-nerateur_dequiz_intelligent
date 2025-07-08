@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from controllers.apprenantController import apprenant_bp, init_apprenant_controller
 from controllers.upload_controller import upload_image  
 from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
-
+from controllers.quizController import quiz_bp
 load_dotenv()
 
 app = Flask(__name__)
@@ -29,7 +29,7 @@ init_edit_profile_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
-
+app.register_blueprint(quiz_bp, url_prefix='/api/quiz') 
 @app.route("/upload", methods=["POST"])
 def handle_upload():
     return upload_image()
