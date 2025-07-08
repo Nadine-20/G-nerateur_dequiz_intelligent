@@ -29,7 +29,8 @@ init_edit_profile_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
-app.register_blueprint(quiz_bp, url_prefix='/api/quiz') 
+app.register_blueprint(quiz_bp)
+
 @app.route("/upload", methods=["POST"])
 def handle_upload():
     return upload_image()
