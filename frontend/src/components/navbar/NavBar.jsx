@@ -57,6 +57,7 @@ function NavBar() {
     const closeDropdown = () => setDropdownOpen(false);
 
     const logout = () => {
+        localStorage.removeItem('userInfo');
         setUser(null);
         closeDropdown();
         navigate('/login');
