@@ -1,5 +1,4 @@
 :root {
-  /* Updated color palette with better contrast */
   --primary: #4338CA;
   --primary-light: #6366F1;
   --secondary: #7C3AED;
@@ -15,7 +14,7 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modern reset with focus states */
+/* Reset & base styles */
 * {
   margin: 0;
   padding: 0;
@@ -39,22 +38,21 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Container styles */
+/* Container */
 .dashboard-container {
-  padding: 2rem 1.5rem;
-  padding-bottom: 4rem;
+  padding: 2rem 1.5rem 4rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* Header section with subtle gradient */
+/* Header */
 .dashboard-header {
   text-align: center;
   margin-bottom: 3rem;
@@ -73,45 +71,7 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.dashboard-header p {
-  color: var(--text-light);
-  max-width: 700px;
-  margin: 0 auto;
-  font-size: 1.1rem;
-}
-
-/* Grid layout with responsive columns */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 2rem;
-  align-items: start;
-}
-
-/* Enhanced card styling */
-.chart-card {
-  background-color: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  width: 100%;
-  border: 1px solid var(--border);
-}
-
-.chart-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.chart-card h2 {
-  font-size: 1.25rem;
-  color: var(--primary);
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-/* Modern tabs with better interaction */
+/* Tabs */
 .tabs {
   display: flex;
   justify-content: center;
@@ -167,7 +127,83 @@ body {
   transform: scaleX(1);
 }
 
-/* Progress bar enhancements */
+/* Stat summary */
+.dashboard-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stat-card {
+  background-color: #F1F5FF;
+  border: 1px solid var(--primary-light);
+  box-shadow: 0 4px 10px rgba(67, 56, 202, 0.1);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  flex: 1 1 160px;
+  min-width: 150px;
+  max-width: 200px;
+  text-align: center;
+  transition: var(--transition);
+  cursor: default;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 18px rgba(67, 56, 202, 0.15);
+}
+
+.stat-card h3 {
+  font-weight: 500;
+  color: var(--primary-light);
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.stat-card p {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0;
+}
+
+/* Grid for charts */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+/* Chart card */
+.chart-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  width: 100%;
+  border: 1px solid var(--border);
+}
+
+.chart-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card h2 {
+  font-size: 1.25rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Progress bar */
 .progress-bar-container {
   width: 100%;
   background-color: var(--border);
@@ -212,7 +248,7 @@ body {
   }
 }
 
-/* Chart text styling */
+/* Chart text */
 .chart-center-text {
   text-align: center;
   font-weight: 500;
@@ -221,23 +257,23 @@ body {
   font-size: 0.95rem;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard-header h1 {
     font-size: 2rem;
   }
-  
+
   .dashboard-header p {
     font-size: 1rem;
   }
-  
+
   .tabs {
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 0.5rem;
     scrollbar-width: thin;
   }
-  
+
   .tab {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
@@ -249,15 +285,15 @@ body {
   .dashboard-container {
     padding: 1.5rem 1rem;
   }
-  
+
   .dashboard-header h1 {
     font-size: 1.75rem;
   }
-  
+
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .chart-card {
     padding: 1.25rem;
   }

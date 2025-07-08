@@ -9,7 +9,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import dayjs from "dayjs"; // npm install dayjs
+import dayjs from "dayjs";
+
+import "./LineProgressChart.css"; // Import du CSS
 
 ChartJS.register(
   LineElement,
@@ -23,49 +25,87 @@ ChartJS.register(
 function LineProgressChart({ userId }) {
   const chartRef = useRef(null);
   const [gradient, setGradient] = useState(null);
-  const [monthlyData, setMonthlyData] = useState([]);
+  const [allMonthlyData, setAllMonthlyData] = useState([]);
+  const [filteredMonthlyData, setFilteredMonthlyData] = useState([]);
+  const [selectedInterval, setSelectedInterval] = useState("Tous");
 
-  // 1. Fetch backend data
+  // Génération des intervalles (3 mois)
+  const generateIntervals = (months) => {
+    if (months.length === 0) return [];
+
+    const sortedMonths = months
+      .map((m) => dayjs(m, "MMMM YYYY"))
+      .sort((a, b) => a - b);
+
+    const intervals = [];
+    let startIndex = 0;
+
+    while (startIndex < sortedMonths.length) {
+      const startMonth = sortedMonths[startIndex];
+      const endMonth = startMonth.add(2, "month");
+
+      const intervalMonths = sortedMonths.filter(
+        (m) => m.isSame(startMonth) || (m.isAfter(startMonth) && m.isBefore(endMonth.add(1, "day")))
+      );
+
+      const label =
+        intervalMonths.length === 1
+          ? intervalMonths[0].format("MMMM YYYY")
+          : `${intervalMonths[0].format("MMM YYYY")} – ${intervalMonths[intervalMonths.length - 1].format("MMM YYYY")}`;
+
+      intervals.push({
+        label,
+        start: intervalMonths[0],
+        end: intervalMonths[intervalMonths.length - 1],
+      });
+
+      startIndex += intervalMonths.length;
+    }
+
+    return intervals;
+  };
+
   useEffect(() => {
     if (!userId) return;
 
     fetch(`http://localhost:5000/api/apprenant/${userId}/progress`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         const history = data.progress || [];
 
-        // Grouper par mois
         const monthMap = {};
 
         history.forEach((entry) => {
-          const date = dayjs(entry.date); // format ISO
-          const month = date.format("MMMM YYYY"); // ex: "Juillet 2025"
+          const isoDate = entry.date?.$date;
+          if (!isoDate) return;
+
+          const date = dayjs(isoDate);
+          const month = date.format("MMMM YYYY");
           if (!monthMap[month]) {
             monthMap[month] = [];
           }
           monthMap[month].push(entry.score || 0);
         });
 
-        // Moyenne par mois
-        const monthly = Object.keys(monthMap).map((month) => {
-          const scores = monthMap[month];
+        const monthly = Object.entries(monthMap).map(([month, scores]) => {
           const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
           return { month, score: Math.round(avg) };
         });
 
-        // Trier par mois
         monthly.sort((a, b) =>
-          dayjs(a.month, "MMMM YYYY").isAfter(dayjs(b.month, "MMMM YYYY"))
-            ? 1
-            : -1
+          dayjs(a.month, "MMMM YYYY").isAfter(dayjs(b.month, "MMMM YYYY")) ? 1 : -1
         );
 
-        setMonthlyData(monthly);
+        setAllMonthlyData(monthly);
+        setFilteredMonthlyData(monthly);
+        setSelectedInterval("Tous");
       })
       .catch((err) => console.error("Erreur fetch progression:", err));
   }, [userId]);
 
-  // 2. Dégradé
   useEffect(() => {
     if (!chartRef.current) return;
     const ctx = chartRef.current.ctx;
@@ -73,19 +113,38 @@ function LineProgressChart({ userId }) {
     gradientFill.addColorStop(0, "rgba(99, 102, 241, 0.6)");
     gradientFill.addColorStop(1, "rgba(79, 70, 229, 0.1)");
     setGradient(gradientFill);
-  }, [monthlyData]);
+  }, [filteredMonthlyData]);
 
-  if (monthlyData.length === 0) {
+  const intervals = generateIntervals(allMonthlyData.map((d) => d.month));
+
+  const handleIntervalClick = (interval) => {
+    setSelectedInterval(interval.label);
+
+    if (interval.label === "Tous") {
+      setFilteredMonthlyData(allMonthlyData);
+    } else {
+      const filtered = allMonthlyData.filter(({ month }) => {
+        const m = dayjs(month, "MMMM YYYY");
+        return (
+          m.isSame(interval.start) ||
+          m.isSame(interval.end) ||
+          (m.isAfter(interval.start) && m.isBefore(interval.end))
+        );
+      });
+      setFilteredMonthlyData(filtered);
+    }
+  };
+
+  if (allMonthlyData.length === 0) {
     return <p style={{ textAlign: "center" }}>Pas encore de progression</p>;
   }
 
-  // 3. Préparer les données
   const data = {
-    labels: monthlyData.map((item) => item.month),
+    labels: filteredMonthlyData.map((item) => item.month),
     datasets: [
       {
         label: "Score mensuel",
-        data: monthlyData.map((item) => item.score),
+        data: filteredMonthlyData.map((item) => item.score),
         borderColor: "var(--primary)",
         backgroundColor: gradient,
         tension: 0.3,
@@ -110,28 +169,17 @@ function LineProgressChart({ userId }) {
     scales: {
       y: {
         beginAtZero: true,
-        grid: {
-          color: "#E5E7EB",
-        },
-        ticks: {
-          color: "var(--text)",
-          font: { size: 14, weight: "500" },
-        },
+        grid: { color: "#E5E7EB" },
+        ticks: { color: "var(--text)", font: { size: 14, weight: "500" } },
       },
       x: {
         grid: { display: false },
-        ticks: {
-          color: "var(--text)",
-          font: { size: 14, weight: "500" },
-        },
+        ticks: { color: "var(--text)", font: { size: 14, weight: "500" } },
       },
     },
     plugins: {
       legend: {
-        labels: {
-          color: "var(--primary)",
-          font: { size: 16, weight: "700" },
-        },
+        labels: { color: "var(--primary)", font: { size: 16, weight: "700" } },
       },
       tooltip: {
         backgroundColor: "var(--primary)",
@@ -145,8 +193,29 @@ function LineProgressChart({ userId }) {
   };
 
   return (
-    <div>
+    <div className="chart-container">
       <Line ref={chartRef} data={data} options={options} />
+
+      <div className="months-tabs">
+        <button
+          onClick={() => handleIntervalClick({ label: "Tous", start: null, end: null })}
+          className={selectedInterval === "Tous" ? "selected" : ""}
+          type="button"
+        >
+          Tous
+        </button>
+
+        {intervals.map((interval) => (
+          <button
+            key={interval.label}
+            onClick={() => handleIntervalClick(interval)}
+            className={selectedInterval === interval.label ? "selected" : ""}
+            type="button"
+          >
+            {interval.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,29 @@
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.months-tabs {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.months-tabs button {
+  margin: 0 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #eee;
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.months-tabs button.selected {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.months-tabs button:hover:not(.selected) {
+  background-color: #d1d5db;
+}
