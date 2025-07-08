@@ -6,11 +6,20 @@ import DoughnutSuccessChart from "./DoughnutSuccessChart";
 import ProgressDashboard from "./ProgressDashboard";
 import dayjs from "dayjs";
 import "./Dashboard.css";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("line");
   const [userId, setUserId] = useState(null);
   const [summaryStats, setSummaryStats] = useState(null);
+
+
+  const [userInfo, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId") || "user-007";
@@ -38,9 +47,9 @@ function Dashboard() {
         // Ici je prends la dernière date dans history (la plus récente)
         const lastDateObj = history.length > 0
           ? history.reduce((max, cur) => {
-              const curDate = dayjs(cur.date?.$date);
-              return curDate.isAfter(max) ? curDate : max;
-            }, dayjs("1900-01-01"))
+            const curDate = dayjs(cur.date?.$date);
+            return curDate.isAfter(max) ? curDate : max;
+          }, dayjs("1900-01-01"))
           : dayjs();
 
         const lastConnect = lastDateObj.format("DD MMMM YYYY");
@@ -60,6 +69,9 @@ function Dashboard() {
     { id: "doughnut", label: "Succès" },
   ];
 
+  if (!userInfo) {
+    return navigate("/login");
+  }
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -105,7 +117,7 @@ function Dashboard() {
         )}
       </div>
 
-       {/* Section Statistiques Résumées */}
+      {/* Section Statistiques Résumées */}
       {summaryStats && (
         <section className="dashboard-summary">
           <div className="stat-card">
