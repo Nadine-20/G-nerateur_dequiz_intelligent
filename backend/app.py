@@ -8,6 +8,9 @@ from controllers.apprenantController import apprenant_bp, init_apprenant_control
 from controllers.upload_controller import upload_image  
 from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
 from controllers.quizController import quiz_bp
+from controllers.login_controller import login, init_login_controller
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -26,6 +29,7 @@ except Exception as e:
 # Initialise les contrôleurs avec mongo
 init_apprenant_controller(mongo)
 init_edit_profile_controller(mongo)
+init_login_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -38,6 +42,10 @@ def handle_upload():
 @app.route("/api/editProfile", methods=["PUT"])
 def handle_edit_profile():
     return edit_profile()
+
+@app.route("/login", methods=["POST"])
+def handle_login():
+    return login()
 
 if __name__ == "__main__":
     app.run(debug=True)
