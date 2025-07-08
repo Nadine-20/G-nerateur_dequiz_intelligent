@@ -1,18 +1,17 @@
 from flask import Blueprint, request, jsonify
 from pymongo import MongoClient
-from bson import ObjectId
 from models.quiz import validate_quiz
 
 quiz_bp = Blueprint('quiz_bp', __name__)
 
-# Connexion MongoDB
+# Connexion à MongoDB
 client = MongoClient("mongodb+srv://youssefbenothmen285:cQQO0P0Hr6mOo2Ej@cluster0.8dkqhcy.mongodb.net/")
 db = client["platforme_quiz"]
 quiz_collection = db["quizzes"]
 
-# Transformer _id en string
+# Convertir _id en string pour le frontend
 def serialize_quiz(quiz):
-    quiz["_id"] = str(quiz["_id"])  # Conversion de _id en chaîne
+    quiz["_id"] = str(quiz["_id"])
     return quiz
 
 # 🔹 GET /api/quizzes : liste tous les quiz
@@ -37,22 +36,15 @@ def create_quiz():
 def save_attempt_to_quiz():
     data = request.get_json()
 
-    quiz_id = data.get("quizId")  # doit correspondre à _id dans MongoDB
+    quiz_id = data.get("quizId")  # "quiz_001"
     if not quiz_id:
         return jsonify({"error": "quizId manquant"}), 400
 
-    # Convertir quizId en ObjectId pour correspondre à MongoDB
-    try:
-        quiz_id = ObjectId(quiz_id)
-    except Exception as e:
-        return jsonify({"error": "ID de quiz invalide"}), 400
-
-    # Vérifie si le quiz existe
+    # Cherche par _id en tant que string
     quiz = quiz_collection.find_one({"_id": quiz_id})
     if not quiz:
-        return jsonify({"error": f"Aucun quiz trouvé avec l'ID : {quiz_id}"}), 404
+        return jsonify({"error": f"Aucun quiz trouvé avec le quizId : {quiz_id}"}), 404
 
-    # Crée la tentative
     attempt = {
         "userId": data.get("userId"),
         "score": data.get("score"),
@@ -62,19 +54,16 @@ def save_attempt_to_quiz():
         "answers": data.get("answers")
     }
 
-    # Validation des données de la tentative
     if not attempt["userId"] or not isinstance(attempt["score"], int) or not isinstance(attempt["totalQuestions"], int):
-        return jsonify({"error": "Données de tentative manquantes ou invalides"}), 400
+        return jsonify({"error": "Données de tentative invalides"}), 400
 
-    # Ajoute la tentative à la liste des attempts du quiz
     result = quiz_collection.update_one(
         {"_id": quiz_id},
         {"$push": {"attempts": attempt}}
     )
 
     if result.matched_count == 1:
-        print(f"✅ Tentative ajoutée au quiz {quiz_id}")
         return jsonify({"message": "Tentative enregistrée"}), 201
     else:
-        print(f"❌ Échec de l'ajout de la tentative pour le quiz {quiz_id}")
-        return jsonify({"error": "Échec de l'ajout de la tentative"}), 500
+        return jsonify({"error": "Échec de l'enregistrement"}), 500
+
