@@ -1,178 +1,176 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './navbar.css';
-import { Link } from 'react-router-dom';
-import { AiOutlineHome, AiOutlineLogin, AiOutlineUserAdd } from 'react-icons/ai';
-import { MdOutlineQuiz } from 'react-icons/md';
-import { FiChevronDown, FiUser, FiX } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+    AiOutlineHome,
+    AiOutlineLogin,
+    AiOutlineUserAdd,
+    AiOutlineLogout,
+    AiOutlineEdit
+} from 'react-icons/ai';
+import { MdOutlineQuiz, MdDashboard } from 'react-icons/md';
+import { FiChevronDown, FiX } from 'react-icons/fi';
 
 function NavBar() {
-    const userInfo = {
-        userName: "JohnDoe",
-        firstName: "first name",
-        lastName: "last name",
-        email: "john@example.com",
-        role: "student" // can be "admin", "teacher", or "student"
-    };
+    const [userInfo, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
+    useEffect(() => {
+        const handleUserInfoChange = () => {
+            const storedUser = localStorage.getItem('userInfo');
+            setUser(storedUser ? JSON.parse(storedUser) : null);
+        };
+
+        window.addEventListener('userInfoChanged', handleUserInfoChange);
+
+        const syncUserInfo = (event) => {
+            if (event.key === 'userInfo') {
+                const newUser = event.newValue ? JSON.parse(event.newValue) : null;
+                setUser(newUser);
+            }
+        };
+        window.addEventListener('storage', syncUserInfo);
+
+        return () => {
+            window.removeEventListener('userInfoChanged', handleUserInfoChange);
+            window.removeEventListener('storage', syncUserInfo);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownOpen && !event.target.closest('.right-nav-container')) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [dropdownOpen]);
+
+    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+    const closeDropdown = () => setDropdownOpen(false);
+
+    const logout = () => {
+        localStorage.removeItem('userInfo');
+        setUser(null);
+        closeDropdown();
+        navigate('/login');
     };
 
-    const closeDropdown = () => {
-        setDropdownOpen(false);
-    };
+    const getFirstLetter = (str) => (str && str.length > 0 ? str.charAt(0).toUpperCase() : '');
 
     return (
         <nav className="navigation-container">
             <div className="navigation-content">
-                {/* Left Navigation Items */}
-                <div className="left-nav-items">
-                    <Link
-                        to="/"
-                        className="nav-link"
-                        onClick={closeDropdown}
-                    >
-                        <AiOutlineHome className="nav-icon" size={24} />
-                        <span className="nav-text">Home</span>
-                    </Link>
-                    <Link
-                        to="/quizzes"
-                        className="nav-link"
-                        onClick={closeDropdown}
-                    >
-                        <MdOutlineQuiz className="nav-icon" size={24} />
-                        <span className="nav-text">Quizzes</span>
-                    </Link>
-                </div>
+                <Link to="/" className="nav-link" onClick={closeDropdown}>
+                    <AiOutlineHome size={20} />
+                    <span className="nav-text">Home</span>
+                </Link>
 
-                {/* Right Navigation Items */}
-                <div className="right-nav-container">
-                    {userInfo ? (
-                        <div className="user-nav-items">
-                            <button
-                                onClick={toggleDropdown}
-                                className="user-button"
-                                aria-expanded={dropdownOpen}
-                                aria-label="User menu"
-                            >
-                                <div className="user-avatar">
-                                    <FiUser className="avatar-icon" size={16} />
-                                </div>
-                                <span className="username">{userInfo.userName}</span>
-                                {dropdownOpen ? (
-                                    <FiX className="dropdown-icon" size={18} />
-                                ) : (
-                                    <FiChevronDown className="dropdown-icon" size={18} />
-                                )}
-                            </button>
+                <Link to="/quizzes" className="nav-link" onClick={closeDropdown}>
+                    <MdOutlineQuiz size={20} />
+                    <span className="nav-text">Quizzes</span>
+                </Link>
 
-                            {/* Dropdown Menu */}
-                            {dropdownOpen && (
-                                <div className="dropdown-menu">
-                                    <div className="dropdown-header">
-                                        <p className="dropdown-username">{userInfo.userName}</p>
-                                        <p className="dropdown-email">{userInfo.email}</p>
-                                        <p className="dropdown-role">{userInfo.role.charAt(0).toUpperCase() + userInfo.role.slice(1)}</p>
+                {userInfo ? (
+                    <div className="right-nav-container">
+                        <button
+                            onClick={toggleDropdown}
+                            className="user-button"
+                            aria-expanded={dropdownOpen}
+                            aria-label="User menu"
+                        >
+                            <div className="user-avatar">
+                                {getFirstLetter(userInfo.firstName)}
+                            </div>
+                            <span className="user-name">{userInfo.firstName || ''}</span>
+                            {dropdownOpen ? <FiX size={16} /> : <FiChevronDown size={16} />}
+                        </button>
+
+                        <div className={`dropdown-menu ${dropdownOpen ? 'open' : ''}`}>
+                            <div className="dropdown-header">
+                                <div className="user-info">
+                                    <div className="user-avatar large">
+                                        {getFirstLetter(userInfo.firstName)}
                                     </div>
-
-                                    {/* Admin specific links */}
-                                    {userInfo.role === "admin" && (
-                                        <>
-                                            <Link
-                                                to='/admin/users'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>Manage Users</span>
-                                            </Link>
-                                        </>
-                                    )}
-
-                                    {/* Teacher specific links */}
-                                    {userInfo.role === "teacher" && (
-                                        <>
-                                            <Link
-                                                to='/teacher/quizzes/create'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>Create Quiz</span>
-                                            </Link>
-                                            <Link
-                                                to='/teacher/quizzes'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>My Quizzes</span>
-                                            </Link>
-                                            <Link
-                                                to='/teacher/dashboard'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>Dashboard</span>
-                                            </Link>
-                                        </>
-                                    )}
-
-                                    {/* Student specific links */}
-                                    {userInfo.role === "student" && (
-                                        <>
-                                            <Link
-                                                to='/student/dashboard'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>Dashboard</span>
-                                            </Link>
-                                            <Link
-                                                to='/student/revision'
-                                                className="dropdown-item"
-                                                onClick={closeDropdown}
-                                            >
-                                                <span>Revision Mode</span>
-                                            </Link>
-                                        </>
-                                    )}
-
-                                    {/* Common links for all roles */}
-                                    <Link
-                                        to='/edit-profile'
-                                        className="dropdown-item"
-                                        onClick={closeDropdown}
-                                    >
-                                        <span>Edit Profile</span>
-                                    </Link>
-                                    <button
-                                        className="dropdown-item logout-button"
-                                        onClick={closeDropdown}
-                                    >
-                                        Logout
-                                    </button>
+                                    <div>
+                                        <p className="user-fullname">
+                                            {(userInfo.firstName || '') + ' ' + (userInfo.lastName || '')}
+                                        </p>
+                                        <p className="user-email">{userInfo.email || ''}</p>
+                                    </div>
                                 </div>
-                            )}
+                                <span className="user-role">{userInfo.role}</span>
+                            </div>
+
+                            <div className="dropdown-divider"></div>
+
+                            <div className="dropdown-items">
+                                {userInfo.role === "admin" && (
+                                    <Link to="/admin/users" className="dropdown-item" onClick={closeDropdown}>
+                                        <span className="dropdown-icon">👥</span>
+                                        <span>Manage Users</span>
+                                    </Link>
+                                )}
+
+                                {userInfo.role === "teacher" && (
+                                    <>
+                                        <Link to="/teacher/quizzes/create" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">✏️</span>
+                                            <span>Create Quiz</span>
+                                        </Link>
+                                        <Link to="/teacher/quizzes" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">📝</span>
+                                            <span>My Quizzes</span>
+                                        </Link>
+                                        <Link to="/teacher/dashboard" className="dropdown-item" onClick={closeDropdown}>
+                                            <MdDashboard size={16} className="dropdown-icon" />
+                                            <span>Dashboard</span>
+                                        </Link>
+                                    </>
+                                )}
+
+                                {userInfo.role === "student" && (
+                                    <>
+                                        <Link to="/student/dashboard" className="dropdown-item" onClick={closeDropdown}>
+                                            <MdDashboard size={16} className="dropdown-icon" />
+                                            <span>Dashboard</span>
+                                        </Link>
+                                    </>
+                                )}
+
+                                <Link to="/edit-profile" className="dropdown-item" onClick={closeDropdown}>
+                                    <AiOutlineEdit size={16} className="dropdown-icon" />
+                                    <span>Edit Profile</span>
+                                </Link>
+                            </div>
+
+                            <div className="dropdown-divider"></div>
+
+                            <button onClick={logout} className="dropdown-item logout">
+                                <AiOutlineLogout size={16} className="dropdown-icon" />
+                                <span>Logout</span>
+                            </button>
                         </div>
-                    ) : (
-                        <div className="auth-nav-items">
-                            <Link
-                                to="/login"
-                                className="nav-link"
-                            >
-                                <AiOutlineLogin className="nav-icon" size={24} />
-                                <span className="nav-text">Login</span>
-                            </Link>
-                            <Link
-                                to="/register"
-                                className="nav-link"
-                            >
-                                <AiOutlineUserAdd className="nav-icon" size={24} />
-                                <span className="nav-text">Register</span>
-                            </Link>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <>
+                        <Link to="/login" className="nav-link">
+                            <AiOutlineLogin size={20} />
+                            <span className="nav-text">Login</span>
+                        </Link>
+                        <Link to="/register" className="nav-link">
+                            <AiOutlineUserAdd size={20} />
+                            <span className="nav-text">Register</span>
+                        </Link>
+                    </>
+                )}
             </div>
         </nav>
     );

@@ -1,16 +1,18 @@
+import { use, useEffect, useState } from 'react';
 import EditProfileForm from '../components/edit-profile/EditProfileForm'
+import { useNavigate } from 'react-router-dom';
 
 function EditProfilePage() {
 
-    // api call to get user
+    const [userInfo, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
 
-    const userInfo = {
-        userName: "test",
-        firstName: "first name",
-        lastName: "last name",
-        email: "student1@example.com",
-        role: "student"
+    if (!userInfo) {
+        return useNavigate('/login');
     }
+
     return (
         <>
             <EditProfileForm user={userInfo} />

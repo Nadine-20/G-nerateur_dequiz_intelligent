@@ -21,8 +21,12 @@ def login():
     if not check_password_hash(user["password"], data.get("password")):
         return jsonify({"message": "Invalid email or password."}), 401
 
+
+
     return jsonify({
         "message": "Login successful",
-        "user_id": str(user["_id"]),
-        "email": user["email"]
+        "firstName": user.get("firstName", ""),
+        "lastName":  user.get("lastName", ""),
+        "email": user.get("email", ""),
+        "role": user.get("role", ""),
     }), 200
