@@ -1,11 +1,12 @@
-// QuizzesPage.jsx
 import React, { useState } from 'react';
 import { FaCheck, FaTimes, FaArrowLeft, FaArrowRight, FaRedo, FaLock } from 'react-icons/fa';
 import './QuizzesPage.css';
+import axios from 'axios';
 
 const courses = [
   {
     id: 1,
+    quizId: "quiz_001",
     title: "Introduction à l'analyse",
     description: "Maîtrisez les bases de l'analyse mathématique avec ce cours complet.",
     chapters: [
@@ -37,6 +38,7 @@ const courses = [
   },
   {
     id: 2,
+    quizId: "quiz_002",
     title: "Données et structure",
     description: "Apprenez les structures de données fondamentales en informatique.",
     chapters: [
@@ -58,8 +60,10 @@ const courses = [
       }
     ]
   },
+  // Nouveau quiz ajouté : "Structures algorithmiques"
   {
     id: 3,
+    quizId: "quiz_003",
     title: "Structures algorithmiques",
     description: "Découvrez les structures de contrôle essentielles en programmation.",
     chapters: [
@@ -123,11 +127,39 @@ function QuizzesPage() {
 
   const startCourse = (index) => {
     setCurrentCourseIndex(index);
-    setCurrentChapterIndex(0);
-    setScore(0);
-    setShowResult(false);
-    setSelectedOptions({});
-    setAnswered([]);
+    resetQuiz();
+  };
+
+  const percentage = Math.round(
+    (score / courses[currentCourseIndex]?.chapters.length) * 100
+  );
+
+  const submitResults = () => {
+    const chapterKeys = Object.keys(selectedOptions);
+    const answers = {};
+
+    chapterKeys.forEach(key => {
+      const [_, chapterIndex] = key.split("-");
+      const chapter = courses[currentCourseIndex].chapters[parseInt(chapterIndex)];
+      const selectedIndex = selectedOptions[key];
+      answers[`q${parseInt(chapterIndex) + 1}`] = chapter.quiz.options[selectedIndex];
+    });
+
+    const attemptData = {
+      userId: "student_001",
+      quizId: courses[currentCourseIndex].quizId,
+      score: score,
+      totalQuestions: courses[currentCourseIndex].chapters.length,
+      percentage: percentage,
+      submittedAt: new Date().toISOString(),
+      answers: answers
+    };
+
+    axios.post("http://localhost:5000/api/attempts", attemptData)
+      .then(res => {
+        console.log("Tentative enregistrée :", res.data);
+      })
+      .catch(err => console.error("Erreur d’envoi :", err));
   };
 
   const goToNextChapter = () => {
@@ -135,10 +167,12 @@ function QuizzesPage() {
       setCurrentChapterIndex(currentChapterIndex + 1);
     } else {
       setShowResult(true);
-      // Unlock next course if score is good enough
-      if (currentCourseIndex + 1 < courses.length &&
+      submitResults();
+      if (
+        currentCourseIndex + 1 < courses.length &&
         !unlockedCourses.includes(currentCourseIndex + 1) &&
-        score / courses[currentCourseIndex].chapters.length >= 0.7) {
+        score / courses[currentCourseIndex].chapters.length >= 0.7
+      ) {
         setUnlockedCourses([...unlockedCourses, currentCourseIndex + 1]);
       }
     }
@@ -149,10 +183,6 @@ function QuizzesPage() {
       setCurrentChapterIndex(currentChapterIndex - 1);
     }
   };
-
-  const percentage = Math.round(
-    (score / courses[currentCourseIndex]?.chapters.length) * 100
-  );
 
   const currentChapter = currentCourseIndex !== null
     ? courses[currentCourseIndex].chapters[currentChapterIndex]
