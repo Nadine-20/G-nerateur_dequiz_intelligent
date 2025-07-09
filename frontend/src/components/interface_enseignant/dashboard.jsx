@@ -6,8 +6,7 @@ import CompetanceEleve from "./charts/CompetanceParEleve";
 import "./dashboard.css";
 import profilIcon from "./images/profil.png";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import Redirect from "../Redirect";
 
 
 
@@ -18,19 +17,13 @@ const dashboard = () => {
         const storedUser = localStorage.getItem('userInfo');
         return storedUser ? JSON.parse(storedUser) : null;
     });
-    const navigate = useNavigate();
 
     if (!userInfo) {
-        return navigate("/login");
+        return <Redirect />;
     }
 
     if (userInfo.role !== "teacher") {
-        return (
-            <div className="error-container">
-                <h2>Accès refusé</h2>
-                <p>Vous n'avez pas les autorisations nécessaires pour accéder à cette page.</p>
-            </div>
-        );
+        return <h3>Vous devez être un enseignant pour accéder à ce tableau de bord</h3>;
     }
     return (
         <div id="container">

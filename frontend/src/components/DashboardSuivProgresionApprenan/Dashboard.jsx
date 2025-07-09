@@ -5,8 +5,8 @@ import BarQuizScoresChart from "./BarQuizScoresChart";
 import DoughnutSuccessChart from "./DoughnutSuccessChart";
 import ProgressDashboard from "./ProgressDashboard";
 import dayjs from "dayjs";
+import Redirect from "../Redirect";
 import "./Dashboard.css";
-import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("line");
@@ -18,8 +18,6 @@ function Dashboard() {
     const storedUser = localStorage.getItem('userInfo');
     return storedUser ? JSON.parse(storedUser) : null;
   });
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId") || "user-007";
@@ -69,9 +67,17 @@ function Dashboard() {
     { id: "doughnut", label: "Succès" },
   ];
 
+
+
   if (!userInfo) {
-    return navigate("/login");
+    return <Redirect />;
   }
+
+  if (userInfo.role !== "student") {
+    return <h3>Vous devez être un apprenant pour accéder au tableau de bord</h3>;
+  }
+
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">

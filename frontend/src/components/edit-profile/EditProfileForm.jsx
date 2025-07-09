@@ -121,8 +121,6 @@ function EditProfileForm({ user }) {
             window.dispatchEvent(new Event('userInfoChanged'));
             toast.success("Profile updated successfully!");
 
-            navigate(`/${formData.role === 'admin' ? '/' : formData.role}/dashboard`);
-
         } catch (error) {
             console.error(error);
             toast.error(error.message || "Something went wrong");
@@ -131,7 +129,6 @@ function EditProfileForm({ user }) {
         }
     };
 
-    // Cancel button handler
     const handleCancel = () => {
         setFormData(initialFormData);
         setPreviewImage(

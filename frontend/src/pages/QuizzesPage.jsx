@@ -3,6 +3,7 @@ import { FaCheck, FaTimes, FaArrowLeft, FaArrowRight, FaRedo, FaLock } from 'rea
 import './QuizzesPage.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Redirect from '../components/Redirect';
 
 const courses = [
   {
@@ -198,7 +199,7 @@ function QuizzesPage() {
     : null;
 
   if (!userInfo) {
-    return navigate("/login");
+    return <Redirect />;
   }
 
 

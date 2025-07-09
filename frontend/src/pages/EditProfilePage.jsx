@@ -1,7 +1,6 @@
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import EditProfileForm from '../components/edit-profile/EditProfileForm'
-import { useNavigate } from 'react-router-dom';
-
+import Redirect from '../components/Redirect';
 function EditProfilePage() {
 
     const [userInfo, setUser] = useState(() => {
@@ -10,7 +9,7 @@ function EditProfilePage() {
     });
 
     if (!userInfo) {
-        return useNavigate('/login');
+        return <Redirect />;
     }
 
     return (
