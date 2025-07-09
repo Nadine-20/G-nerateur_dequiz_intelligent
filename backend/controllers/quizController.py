@@ -66,4 +66,4 @@ def save_attempt_to_quiz():
         return jsonify({"message": "Tentative enregistrée"}), 201
     else:
         return jsonify({"error": "Échec de l'enregistrement"}), 500
-
+  
