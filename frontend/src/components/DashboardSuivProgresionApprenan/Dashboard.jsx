@@ -5,12 +5,19 @@ import BarQuizScoresChart from "./BarQuizScoresChart";
 import DoughnutSuccessChart from "./DoughnutSuccessChart";
 import ProgressDashboard from "./ProgressDashboard";
 import dayjs from "dayjs";
+import Redirect from "../Redirect";
 import "./Dashboard.css";
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("line");
   const [userId, setUserId] = useState(null);
   const [summaryStats, setSummaryStats] = useState(null);
+
+
+  const [userInfo, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId") || "user-007";
@@ -38,9 +45,9 @@ function Dashboard() {
         // Ici je prends la dernière date dans history (la plus récente)
         const lastDateObj = history.length > 0
           ? history.reduce((max, cur) => {
-              const curDate = dayjs(cur.date?.$date);
-              return curDate.isAfter(max) ? curDate : max;
-            }, dayjs("1900-01-01"))
+            const curDate = dayjs(cur.date?.$date);
+            return curDate.isAfter(max) ? curDate : max;
+          }, dayjs("1900-01-01"))
           : dayjs();
 
         const lastConnect = lastDateObj.format("DD MMMM YYYY");
@@ -59,6 +66,17 @@ function Dashboard() {
     { id: "progress", label: "Suivi Progression" },
     { id: "doughnut", label: "Succès" },
   ];
+
+
+
+  if (!userInfo) {
+    return <Redirect />;
+  }
+
+  if (userInfo.role !== "student") {
+    return <h3>Vous devez être un apprenant pour accéder au tableau de bord</h3>;
+  }
+
 
   return (
     <div className="dashboard-container">
@@ -105,7 +123,7 @@ function Dashboard() {
         )}
       </div>
 
-       {/* Section Statistiques Résumées */}
+      {/* Section Statistiques Résumées */}
       {summaryStats && (
         <section className="dashboard-summary">
           <div className="stat-card">

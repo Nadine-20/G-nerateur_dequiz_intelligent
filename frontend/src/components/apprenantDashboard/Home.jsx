@@ -1,6 +1,7 @@
 // Home.jsx
 import { FaGraduationCap, FaChartLine, FaBook, FaTasks } from 'react-icons/fa';
 import './Home.css';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
@@ -12,7 +13,7 @@ export default function Home() {
             Découvrez une nouvelle façon d'apprendre avec notre plateforme de quiz intelligente.
             Personnalisée, interactive et conçue pour maximiser votre réussite.
           </p>
-          <a href="/quiz" className="cta-button">Commencer maintenant</a>
+          <Link to="/quizzes" className="cta-button">Commencer maintenant</Link>
         </div>
 
         <div className="features-grid">

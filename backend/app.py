@@ -43,7 +43,7 @@ def handle_upload():
 def handle_edit_profile():
     return edit_profile()
 
-@app.route("/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"])
 def handle_login():
     return login()
 

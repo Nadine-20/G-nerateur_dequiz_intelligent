@@ -6,12 +6,25 @@ import CompetanceEleve from "./charts/CompetanceParEleve";
 import "./dashboard.css";
 import profilIcon from "./images/profil.png";
 import { useState } from "react";
-
+import Redirect from "../Redirect";
 
 
 
 const dashboard = () => {
     const [activeTab, setActiveTab] = useState("line");
+
+    const [userInfo, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
+
+    if (!userInfo) {
+        return <Redirect />;
+    }
+
+    if (userInfo.role !== "teacher") {
+        return <h3>Vous devez être un enseignant pour accéder à ce tableau de bord</h3>;
+    }
     return (
         <div id="container">
             <main>
@@ -44,45 +57,45 @@ const dashboard = () => {
                     </div>
 
 
-                        <div id="last_activities">
-                            <h3>Derniers élèves connectés</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Cours</th>
-                                        <th>Score</th>
-                                        <th>Dernière activité</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Emilie Lefevre</td>
-                                        <td>Mathématique</td>
-                                        <td>78%</td>
-                                        <td>23 avril</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Antoine Dubois</td>
-                                        <td>Physique</td>
-                                        <td>92%</td>
-                                        <td>22 avril</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Lucas Bernard</td>
-                                        <td>Histoire</td>
-                                        <td>85%</td>
-                                        <td>21 avril</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Camille Robert</td>
-                                        <td>Chimie</td>
-                                        <td>69%</td>
-                                        <td>20 avril</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div id="last_activities">
+                        <h3>Derniers élèves connectés</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Cours</th>
+                                    <th>Score</th>
+                                    <th>Dernière activité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Emilie Lefevre</td>
+                                    <td>Mathématique</td>
+                                    <td>78%</td>
+                                    <td>23 avril</td>
+                                </tr>
+                                <tr>
+                                    <td>Antoine Dubois</td>
+                                    <td>Physique</td>
+                                    <td>92%</td>
+                                    <td>22 avril</td>
+                                </tr>
+                                <tr>
+                                    <td>Lucas Bernard</td>
+                                    <td>Histoire</td>
+                                    <td>85%</td>
+                                    <td>21 avril</td>
+                                </tr>
+                                <tr>
+                                    <td>Camille Robert</td>
+                                    <td>Chimie</td>
+                                    <td>69%</td>
+                                    <td>20 avril</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             </main>
 

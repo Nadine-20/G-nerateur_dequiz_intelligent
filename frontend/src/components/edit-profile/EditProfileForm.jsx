@@ -2,17 +2,21 @@ import { useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 import './editProfile.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 function EditProfileForm({ user }) {
     const initialFormData = {
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
         email: user?.email || '',
+        role: user?.role || 'student',
         profilePicture: user?.profilePicture || null,
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
     };
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState(initialFormData);
     const [previewImage, setPreviewImage] = useState(
@@ -67,7 +71,6 @@ function EditProfileForm({ user }) {
         try {
             let profilePictureUrl = formData.profilePicture;
 
-            // Handle image upload if it's a File
             if (formData.profilePicture && formData.profilePicture instanceof File) {
                 const imageForm = new FormData();
                 imageForm.append('image', formData.profilePicture);
@@ -89,6 +92,7 @@ function EditProfileForm({ user }) {
                 email: formData.email,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
+                role: formData.role,
                 profilePicture: profilePictureUrl,
             };
 
@@ -112,6 +116,9 @@ function EditProfileForm({ user }) {
                 throw new Error(resData.message || 'Failed to update profile');
             }
 
+            const updatedUserInfo = resData.updatedUser || payload;
+            localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+            window.dispatchEvent(new Event('userInfoChanged'));
             toast.success("Profile updated successfully!");
 
         } catch (error) {
@@ -122,7 +129,6 @@ function EditProfileForm({ user }) {
         }
     };
 
-    // Cancel button handler
     const handleCancel = () => {
         setFormData(initialFormData);
         setPreviewImage(

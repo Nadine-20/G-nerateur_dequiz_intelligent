@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FaCheck, FaTimes, FaArrowLeft, FaArrowRight, FaRedo, FaLock } from 'react-icons/fa';
 import './QuizzesPage.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Redirect from '../components/Redirect';
 
 const courses = [
   {
@@ -101,6 +103,14 @@ function QuizzesPage() {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [answered, setAnswered] = useState([]);
 
+
+  const [userInfo, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const navigate = useNavigate();
+
   const handleAnswer = (optionIndex) => {
     const chapterKey = `${currentCourseIndex}-${currentChapterIndex}`;
     if (!answered.includes(chapterKey)) {
@@ -187,6 +197,11 @@ function QuizzesPage() {
   const currentChapter = currentCourseIndex !== null
     ? courses[currentCourseIndex].chapters[currentChapterIndex]
     : null;
+
+  if (!userInfo) {
+    return <Redirect />;
+  }
+
 
   return (
     <div className="quizzes-container">
