@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './signup.css';
 
 const SignUp = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'student', // default role
+        role: 'student',
         niveau: '',
         gender: '',
-        matiere: '' // for teachers
+        matiere: ''
     });
 
     const [errors, setErrors] = useState({});
@@ -19,10 +23,10 @@ const SignUp = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData(prev => ({
+            ...prev,
             [name]: value
-        });
+        }));
     };
 
     const validateForm = () => {
@@ -45,7 +49,6 @@ const SignUp = () => {
         }
         if (!formData.gender) newErrors.gender = 'Gender is required';
 
-        // Role-specific validations
         if (formData.role === 'student' && !formData.niveau) {
             newErrors.niveau = 'Grade level is required';
         }
@@ -57,35 +60,35 @@ const SignUp = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            setIsSubmitting(true);
+        if (!validateForm()) return;
 
-            // Prepare final data matching your DB structure
-            const userData = {
+        setIsSubmitting(true);
+
+        try {
+            const response = await axios.post('http://localhost:5000/api/signup', {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
-                password: formData.password, // In real app, this would be hashed
+                password: formData.password,
+                confirmPassword: formData.confirmPassword,
                 role: formData.role,
                 gender: formData.gender,
-                ...(formData.role === 'student' && { niveau: formData.niveau }),
-                ...(formData.role === 'teacher' && { matiere: formData.matiere }),
-                createdAt: new Date().toISOString(),
-                date: new Date().toLocaleDateString('fr-FR'), // jj/mm/aa format
-                quizHistory: [],
-                customQuizzes: [],
-                lastConnect: new Date().toISOString()
-            };
+                niveau: formData.niveau,
+                matiere: formData.matiere
+            });
 
-            console.log('Submitting:', userData);
+            toast.success(response.data.message);
 
-            // Simulate API call
-            setTimeout(() => {
-                setIsSubmitting(false);
-                alert('Registration successful!');
-            }, 1500);
+            navigate(formData.role === 'student' ? '/student/dashboard' : '/teacher/dashboard');
+
+        } catch (error) {
+            const errorMsg = error.response?.data?.message || 'Registration failed. Please try again.';
+            toast.error(errorMsg);
+            console.error('Registration error:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -107,6 +110,7 @@ const SignUp = () => {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 className={errors.firstName ? 'error' : ''}
+                                disabled={isSubmitting}
                             />
                             {errors.firstName && <span className="error-message">{errors.firstName}</span>}
                         </div>
@@ -119,6 +123,7 @@ const SignUp = () => {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 className={errors.lastName ? 'error' : ''}
+                                disabled={isSubmitting}
                             />
                             {errors.lastName && <span className="error-message">{errors.lastName}</span>}
                         </div>
@@ -132,6 +137,7 @@ const SignUp = () => {
                             value={formData.email}
                             onChange={handleChange}
                             className={errors.email ? 'error' : ''}
+                            disabled={isSubmitting}
                         />
                         {errors.email && <span className="error-message">{errors.email}</span>}
                     </div>
@@ -145,6 +151,7 @@ const SignUp = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className={errors.password ? 'error' : ''}
+                                disabled={isSubmitting}
                             />
                             {errors.password && <span className="error-message">{errors.password}</span>}
                         </div>
@@ -157,6 +164,7 @@ const SignUp = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 className={errors.confirmPassword ? 'error' : ''}
+                                disabled={isSubmitting}
                             />
                             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
                         </div>
@@ -172,6 +180,7 @@ const SignUp = () => {
                                     value="student"
                                     checked={formData.role === 'student'}
                                     onChange={handleChange}
+                                    disabled={isSubmitting}
                                 />
                                 Student
                             </label>
@@ -182,6 +191,7 @@ const SignUp = () => {
                                     value="teacher"
                                     checked={formData.role === 'teacher'}
                                     onChange={handleChange}
+                                    disabled={isSubmitting}
                                 />
                                 Teacher
                             </label>
@@ -195,6 +205,7 @@ const SignUp = () => {
                                 value={formData.niveau}
                                 onChange={handleChange}
                                 className={errors.niveau ? 'error' : ''}
+                                disabled={isSubmitting}
                             >
                                 <option value="">Select Grade Level</option>
                                 <option value="7eme année">7th Grade</option>
@@ -212,6 +223,7 @@ const SignUp = () => {
                                 value={formData.matiere}
                                 onChange={handleChange}
                                 className={errors.matiere ? 'error' : ''}
+                                disabled={isSubmitting}
                             >
                                 <option value="">Select Your Specialization</option>
                                 <option value="Mathematics">Mathematics</option>
@@ -237,6 +249,7 @@ const SignUp = () => {
                                     value="male"
                                     checked={formData.gender === 'male'}
                                     onChange={handleChange}
+                                    disabled={isSubmitting}
                                 />
                                 Male
                             </label>
@@ -247,6 +260,7 @@ const SignUp = () => {
                                     value="female"
                                     checked={formData.gender === 'female'}
                                     onChange={handleChange}
+                                    disabled={isSubmitting}
                                 />
                                 Female
                             </label>

@@ -9,6 +9,7 @@ from controllers.upload_controller import upload_image
 from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
 from controllers.quizController import quiz_bp
 from controllers.login_controller import login, init_login_controller
+from controllers.signup_controller import signup, init_signup_controller
 
 
 load_dotenv()
@@ -30,6 +31,8 @@ except Exception as e:
 init_apprenant_controller(mongo)
 init_edit_profile_controller(mongo)
 init_login_controller(mongo)
+init_signup_controller(mongo)
+
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -46,6 +49,10 @@ def handle_edit_profile():
 @app.route("/api/login", methods=["POST"])
 def handle_login():
     return login()
+
+@app.route("/api/signup", methods=["POST"])
+def handle_signup():
+    return signup()
 
 if __name__ == "__main__":
     app.run(debug=True)
