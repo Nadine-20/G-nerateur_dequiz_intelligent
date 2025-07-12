@@ -11,7 +11,7 @@ from controllers.quizController import quiz_bp
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
@@ -40,4 +40,4 @@ def handle_edit_profile():
     return edit_profile()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
