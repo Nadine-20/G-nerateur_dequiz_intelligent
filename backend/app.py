@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_pymongo import PyMongo
 from flask_cors import CORS
 import os
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from controllers.apprenantController import apprenant_bp, init_apprenant_controller
 from controllers.upload_controller import upload_image  
 from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
-from controllers.quizController import quiz_bp
+from controllers.quizController import quiz_bp, init_quiz_controller
 from controllers.login_controller import login, init_login_controller
 from controllers.signup_controller import signup, init_signup_controller
 
@@ -15,7 +15,7 @@ from controllers.signup_controller import signup, init_signup_controller
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app)
 
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
@@ -31,8 +31,8 @@ except Exception as e:
 init_apprenant_controller(mongo)
 init_edit_profile_controller(mongo)
 init_login_controller(mongo)
+init_quiz_controller(mongo)
 init_signup_controller(mongo)
-
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -54,5 +54,21 @@ def handle_login():
 def handle_signup():
     return signup()
 
+# Debug endpoint to check users
+@app.route("/api/debug/users", methods=["GET"])
+def debug_users():
+    users = mongo.db.users.find()
+    user_list = []
+    for user in users:
+        user_list.append({
+            "_id": str(user.get("_id")),
+            "email": user.get("email"),
+            "firstName": user.get("firstName"),
+            "lastName": user.get("lastName"),
+            "role": user.get("role"),
+            "hasPassword": bool(user.get("password"))
+        })
+    return jsonify({"users": user_list, "count": len(user_list)})
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True)

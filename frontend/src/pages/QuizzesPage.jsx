@@ -25,7 +25,32 @@ function QuizzesPage() {
 
   useEffect(() => {
     axios.get("http://localhost:5000/api/quizzes")
-      .then(res => setQuizzes(res.data))
+      .then(res => {
+        // Transform backend quiz structure to frontend format
+        const transformedQuizzes = res.data.map(quiz => {
+          if (quiz.chapters && quiz.chapters.length > 0) {
+            // Transform chapters structure to questions format
+            const questions = quiz.chapters.map((chapter, index) => ({
+              id: `q_${index}`,
+              questionText: chapter.quiz.question,
+              type: 'Qcm', // Assuming all are QCM for now
+              options: chapter.quiz.options.map((option, optIndex) => ({
+                label: String.fromCharCode(65 + optIndex), // A, B, C, D
+                text: option,
+                isCorrect: optIndex === chapter.quiz.answer
+              })),
+              answer: chapter.quiz.answer
+            }));
+            
+            return {
+              ...quiz,
+              questions
+            };
+          }
+          return quiz;
+        });
+        setQuizzes(transformedQuizzes);
+      })
       .catch(err => console.error("Erreur de chargement des quizzes:", err));
   }, []);
 
@@ -68,9 +93,16 @@ function QuizzesPage() {
   };
 
   const saveAttemptToDatabase = () => {
+    // Check if user is logged in
+    if (!userInfo || !userInfo._id) {
+      console.error("User not logged in, cannot save attempt");
+      alert("Vous devez être connecté pour enregistrer vos résultats");
+      return;
+    }
+
     const percentage = Math.round((score / currentQuiz.questions.length) * 100);
     const attemptData = {
-      userId: "user_001",
+      userId: userInfo._id, // Use actual user ID from userInfo
       quizId: currentQuiz._id,
       score: score,
       totalQuestions: currentQuiz.questions.length,
@@ -79,18 +111,34 @@ function QuizzesPage() {
       answers: selectedAnswers
     };
 
-    axios.post(`http://localhost:5000/api/quizzes/${currentQuiz._id}/attempt`, attemptData)
-      .then(res => console.log("Tentative enregistrée :", res.data))
-      .catch(err => console.error("Erreur lors de l'enregistrement :", err));
+    console.log("Saving attempt for user:", userInfo._id);
+    console.log("Attempt data:", attemptData);
 
-    setQuizResults(prev => ({
-      ...prev,
-      [currentQuizIndex]: {
-        score,
-        total: currentQuiz.questions.length,
-        percentage
-      }
-    }));
+    axios.post(`http://localhost:5000/api/quizzes/${currentQuiz._id}/attempt`, attemptData)
+      .then(res => {
+        console.log("Tentative enregistrée :", res.data);
+        // Update quiz results state
+        setQuizResults(prev => ({
+          ...prev,
+          [currentQuizIndex]: {
+            score,
+            total: currentQuiz.questions.length,
+            percentage
+          }
+        }));
+      })
+      .catch(err => {
+        console.error("Erreur lors de l'enregistrement :", err);
+        // Still update local state even if save fails
+        setQuizResults(prev => ({
+          ...prev,
+          [currentQuizIndex]: {
+            score,
+            total: currentQuiz.questions.length,
+            percentage
+          }
+        }));
+      });
   };
 
   const goToNext = () => {

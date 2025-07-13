@@ -79,7 +79,7 @@ function LineProgressChart({ userId }) {
         const monthMap = {};
 
         history.forEach((entry) => {
-          const isoDate = entry.date?.$date;
+          const isoDate = entry.date?.$date || entry.date;
           if (!isoDate) return;
 
           const date = dayjs(isoDate);

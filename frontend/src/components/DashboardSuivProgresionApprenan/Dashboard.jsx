@@ -12,25 +12,39 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState("line");
   const [userId, setUserId] = useState(null);
   const [summaryStats, setSummaryStats] = useState(null);
-
+  const [loading, setLoading] = useState(true);
 
   const [userInfo, setUser] = useState(() => {
     const storedUser = localStorage.getItem('userInfo');
+    console.log("Stored userInfo:", storedUser);
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId") || "user-007";
-    if (storedUserId) setUserId(storedUserId);
-  }, []);
+    console.log("UserInfo from state:", userInfo);
+    if (userInfo && userInfo._id) {
+      console.log("Setting userId to:", userInfo._id);
+      setUserId(userInfo._id);
+    } else {
+      console.log("No user info found, user needs to login");
+      setUserId(null);
+    }
+    setLoading(false);
+  }, [userInfo]);
 
   // Fetch progress data et calcul des stats résumé
   useEffect(() => {
     if (!userId) return;
 
+    console.log("Fetching progress for userId:", userId);
+
     fetch(`http://localhost:5000/api/apprenant/${userId}/progress`)
-      .then((res) => res.json())
+      .then((res) => {
+        console.log("Progress API response status:", res.status);
+        return res.json();
+      })
       .then((data) => {
+        console.log("Progress data received:", data);
         const history = data.progress || [];
 
         const totalQuizzes = history.length;
@@ -45,7 +59,7 @@ function Dashboard() {
         // Ici je prends la dernière date dans history (la plus récente)
         const lastDateObj = history.length > 0
           ? history.reduce((max, cur) => {
-            const curDate = dayjs(cur.date?.$date);
+            const curDate = dayjs(cur.date?.$date || cur.date);
             return curDate.isAfter(max) ? curDate : max;
           }, dayjs("1900-01-01"))
           : dayjs();
@@ -54,10 +68,12 @@ function Dashboard() {
 
         setSummaryStats({ totalQuizzes, averageScore, successRate, lastConnect });
       })
-      .catch((err) => console.error("Erreur fetch progression:", err));
+      .catch((err) => {
+        console.error("Erreur fetch progression:", err);
+        // Set default stats if fetch fails
+        setSummaryStats({ totalQuizzes: 0, averageScore: 0, successRate: 0, lastConnect: dayjs().format("DD MMMM YYYY") });
+      });
   }, [userId]);
-
-  if (!userId) return <p>Chargement du tableau de bord...</p>;
 
   const tabs = [
     { id: "line", label: "Progression Mensuelle" },
@@ -67,7 +83,9 @@ function Dashboard() {
     { id: "doughnut", label: "Succès" },
   ];
 
-
+  if (loading) {
+    return <p>Chargement du tableau de bord...</p>;
+  }
 
   if (!userInfo) {
     return <Redirect />;
@@ -75,6 +93,10 @@ function Dashboard() {
 
   if (userInfo.role !== "student") {
     return <h3>Vous devez être un apprenant pour accéder au tableau de bord</h3>;
+  }
+
+  if (!userId) {
+    return <p>Erreur: Impossible de récupérer l'identifiant utilisateur</p>;
   }
 
 

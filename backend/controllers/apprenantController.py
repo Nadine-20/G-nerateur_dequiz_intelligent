@@ -10,7 +10,11 @@ def init_apprenant_controller(mongo_instance):
 
 @apprenant_bp.route('/<user_id>/progress', methods=['GET'])
 def get_progress(user_id):
+    # Try to find user by string ID first, then by ObjectId
     user = mongo.db.users.find_one({"_id": user_id})
+    if not user and ObjectId.is_valid(user_id):
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    
     if not user:
         return jsonify({"error": "User not found"}), 404
     progress = user.get("quizHistory", [])
@@ -21,7 +25,11 @@ def get_progress(user_id):
 
 @apprenant_bp.route('/<user_id>/custom-quizzes', methods=['GET'])
 def get_custom_quizzes(user_id):
+    # Try to find user by string ID first, then by ObjectId
     user = mongo.db.users.find_one({"_id": user_id})
+    if not user and ObjectId.is_valid(user_id):
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    
     if not user:
         return jsonify({"error": "User not found"}), 404
     custom_quiz_ids = user.get("customQuizzes", [])
@@ -35,7 +43,11 @@ def get_custom_quizzes(user_id):
 
 @apprenant_bp.route('/<user_id>/scores', methods=['GET'])
 def get_scores(user_id):
+    # Try to find user by string ID first, then by ObjectId
     user = mongo.db.users.find_one({"_id": user_id})
+    if not user and ObjectId.is_valid(user_id):
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    
     if not user:
         return jsonify({"error": "User not found"}), 404
     quiz_history = user.get("quizHistory", [])

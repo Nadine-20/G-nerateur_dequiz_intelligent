@@ -1,0 +1,13 @@
+{
+  "userId": "user_001",
+  "quizId": "quiz_001",
+  "score": 2,
+  "totalQuestions": 3,
+  "percentage": 67,
+  "submittedAt": "2025-07-13T18:00:00.000Z",
+  "answers": {
+    "q_0": "A",
+    "q_1": "B",
+    "q_2": "C"
+  }
+}
