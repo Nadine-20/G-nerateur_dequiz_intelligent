@@ -11,7 +11,7 @@
   --text-light: #64748b;
 }
 
-.login-container {
+.signup-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -27,9 +27,9 @@
   to { opacity: 1; }
 }
 
-.login-card {
+.signup-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   padding: 3rem 2.5rem 2.5rem;
   background: #fff;
   border-radius: 20px;
@@ -50,18 +50,13 @@
   }
 }
 
-.login-card:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-  transform: translateY(-5px);
-}
-
-.login-header {
+.signup-header {
   margin-bottom: 2rem;
   text-align: center;
   animation: fadeIn 0.8s ease-out;
 }
 
-.login-header h1 {
+.signup-header h2 {
   font-size: 2rem;
   font-weight: 700;
   color: var(--text);
@@ -69,7 +64,7 @@
   animation: fadeIn 0.8s ease-out 0.1s both;
 }
 
-.login-header p {
+.signup-header p {
   color: var(--text-light);
   font-size: 1rem;
   font-weight: 400;
@@ -77,40 +72,22 @@
 }
 
 /* Form Elements */
-.login-form {
+.signup-form {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
   animation: fadeIn 0.8s ease-out 0.3s both;
 }
 
-.input-group {
+.form-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
   animation: fadeIn 0.8s ease-out 0.4s both;
 }
 
-.label-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.input-field {
-  padding: 1rem 1.25rem;
-  border: 1.5px solid var(--medium-gray);
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 400;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background-color: #f9fafb;
+.form-group {
+  flex: 1;
+  margin-bottom: 0.5rem;
   animation: inputFadeIn 0.6s ease-out 0.5s both;
 }
 
@@ -125,7 +102,27 @@ label {
   }
 }
 
-.input-field:focus {
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--medium-gray);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #f9fafb;
+}
+
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
@@ -133,9 +130,70 @@ label {
   transform: scale(1.02);
 }
 
-/* Button */
-.login-button {
-  padding: 1rem 0;
+.error-message {
+  color: var(--error);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: block;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Radio and Role Groups */
+.role-group,
+.gender-group {
+  margin: 1.5rem 0;
+  animation: fadeIn 0.8s ease-out 0.5s both;
+}
+
+.role-group label,
+.gender-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.role-options,
+.gender-options {
+  display: flex;
+  gap: 1rem;
+}
+
+.role-options label,
+.gender-options label {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 1.5px solid var(--medium-gray);
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.role-options label.active,
+.gender-options label.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: scale(1.02);
+}
+
+.role-options input[type="radio"],
+.gender-options input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+/* Submit Button - Fixed Centering */
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
   background-color: var(--primary);
   color: white;
   border: none;
@@ -145,92 +203,46 @@ label {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeIn 0.8s ease-out 0.6s both;
-  
-  /* Center the text */
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  user-select: none;
-  position: relative;
-  overflow: hidden;
+  gap: 0.5rem;
 }
 
-.login-button:hover {
+.submit-btn:hover {
   background-color: var(--primary-light);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
 }
 
-.login-button:active {
+.submit-btn:active {
   transform: translateY(0);
 }
 
-.login-button:disabled {
+.submit-btn:disabled {
   background-color: var(--medium-gray);
   cursor: not-allowed;
   transform: none !important;
 }
 
-.login-button:after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
-}
-
-.login-button:focus:not(:active)::after {
-  animation: ripple 1s ease-out;
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(20, 20);
-    opacity: 0;
-  }
-}
-
 /* Loading Spinner */
-.login-button.loading:after {
-  content: "";
-  position: absolute;
+.submit-btn .spinner {
   width: 20px;
   height: 20px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Links */
-.forgot-link {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  animation: fadeIn 0.8s ease-out 0.5s both;
-}
-
-.forgot-link:hover {
-  color: var(--primary);
-  text-decoration: underline;
-}
-
-.signup-link {
+/* Footer Links */
+.signup-footer {
   margin-top: 2rem;
   text-align: center;
   font-size: 0.9rem;
@@ -238,7 +250,7 @@ label {
   animation: fadeIn 0.8s ease-out 0.7s both;
 }
 
-.signup-link a {
+.signup-footer a {
   color: var(--primary);
   font-weight: 600;
   text-decoration: none;
@@ -246,7 +258,7 @@ label {
   position: relative;
 }
 
-.signup-link a:after {
+.signup-footer a:after {
   content: '';
   position: absolute;
   width: 100%;
@@ -259,23 +271,24 @@ label {
   transition: transform 0.3s ease-out;
 }
 
-.signup-link a:hover:after {
+.signup-footer a:hover:after {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
 
 /* Responsive Design */
-@media (max-width: 480px) {
-  .login-card {
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .signup-card {
     padding: 2rem 1.5rem;
-    border-radius: 16px;
   }
   
-  .login-header h1 {
-    font-size: 1.7rem;
-  }
-  
-  .input-field {
-    padding: 0.9rem 1rem;
+  .role-options,
+  .gender-options {
+    flex-direction: column;
   }
 }
