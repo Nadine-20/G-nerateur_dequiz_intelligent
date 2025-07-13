@@ -213,21 +213,43 @@
   cursor: pointer;
   transition: var(--transition);
 }
+/* Style par défaut du bouton Commencer */
+.start-btn {
+  background-color: #4361ee; /* bleu */
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Quand le bouton est désactivé (quiz verrouillé) */
+.start-btn:disabled {
+  background-color: #ccc;  /* gris */
+  color: #666;
+  cursor: not-allowed;
+}
+
 
 .nav-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
+/* Précédent (même style que Suivant) */
 .prev-btn {
-  background: var(--light);
-  border: 1px solid var(--light-gray);
-  color: var(--gray);
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
 }
 
 .prev-btn:hover:not(:disabled) {
-  background: var(--light-gray);
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
 }
+
 
 .next-btn {
   background: var(--primary);
@@ -363,6 +385,7 @@
     width: 100%;
   }
 }
+
 
 @media (max-width: 480px) {
   .quizzes-container {

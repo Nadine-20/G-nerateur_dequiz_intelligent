@@ -15,7 +15,7 @@ from controllers.signup_controller import signup, init_signup_controller
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
@@ -55,4 +55,4 @@ def handle_signup():
     return signup()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
