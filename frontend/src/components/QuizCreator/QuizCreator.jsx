@@ -4,11 +4,10 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const QuizCreator = () => {
-  // Main quiz state - expanded to match backend format
   const [quiz, setQuiz] = useState({
     title: '',
     description: '',
-    createdBy: 'teacher_002', // This would normally come from auth context
+    createdBy: userInfo ? userInfo._id : 'teacher_002',
     subject: 'mathématiques',
     isPublic: true,
     topics: [],
@@ -111,11 +110,9 @@ const QuizCreator = () => {
       toast.success('Quiz saved successfully!');
       console.log('Quiz created:', response.data.quiz);
 
-      // Reset the form
       setQuiz({
         title: '',
         description: '',
-        createdBy: userInfo ? userInfo._id : 'teacher_002', 
         subject: 'mathématiques',
         isPublic: true,
         topics: [],
@@ -132,7 +129,6 @@ const QuizCreator = () => {
     }
   };
 
-  // Remove question from quiz
   const removeQuestion = (index) => {
     const updatedQuestions = quiz.questions.filter((_, i) => i !== index);
     setQuiz({
@@ -141,7 +137,6 @@ const QuizCreator = () => {
     });
   };
 
-  // Update quiz metadata
   const handleQuizChange = (e) => {
     const { name, value, type, checked } = e.target;
     setQuiz({
@@ -150,7 +145,6 @@ const QuizCreator = () => {
     });
   };
 
-  // Update question points
   const handleQuestionPointsChange = (e) => {
     setCurrentQuestion({
       ...currentQuestion,
