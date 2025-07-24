@@ -4,6 +4,13 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const QuizCreator = () => {
+
+
+  const [userInfo, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
   const [quiz, setQuiz] = useState({
     title: '',
     description: '',
@@ -15,11 +22,6 @@ const QuizCreator = () => {
     timeLimit: 900,
     maxScore: 100,
     questions: []
-  });
-
-  const [userInfo, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('userInfo');
-    return storedUser ? JSON.parse(storedUser) : null;
   });
 
   // Current question being edited
@@ -108,7 +110,6 @@ const QuizCreator = () => {
       const response = await axios.post('http://localhost:5000/api/create-quiz', quiz);
 
       toast.success('Quiz saved successfully!');
-      console.log('Quiz created:', response.data.quiz);
 
       setQuiz({
         title: '',
@@ -123,7 +124,7 @@ const QuizCreator = () => {
       });
     } catch (error) {
       console.error('Error saving quiz:', error);
-      alert(`Failed to save quiz: ${error.response?.data?.message || error.message}`);
+      toast.error(`Failed to save quiz: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsSubmitting(false);
     }
