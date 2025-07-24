@@ -1,13 +1,13 @@
 from flask import Flask, jsonify
 from flask_pymongo import PyMongo
 from flask_cors import CORS
-import os
+import os  
 from dotenv import load_dotenv
 
 from controllers.apprenantController import apprenant_bp, init_apprenant_controller
 from controllers.upload_controller import upload_image  
 from controllers.editProfile_controller import edit_profile, init_edit_profile_controller
-from controllers.quizController import quiz_bp, init_quiz_controller
+from controllers.quizController import quiz_bp, init_quiz
 from controllers.login_controller import login, init_login_controller
 from controllers.signup_controller import signup, init_signup_controller
 from controllers.creationQuizController import create_quiz, init_quiz_controller
@@ -35,6 +35,7 @@ init_login_controller(mongo)
 init_quiz_controller(mongo)
 init_signup_controller(mongo)
 init_quiz_controller(mongo)
+init_quiz(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
