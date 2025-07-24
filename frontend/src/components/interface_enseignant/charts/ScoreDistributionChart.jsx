@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Chart as ChartJS,
   BarElement,
@@ -11,13 +11,35 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-const ScoreDistributionChart = () => {
-  const scoreBuckets = [
-    { range: "0–49%", count: 5 },
-    { range: "50–69%", count: 10 },
-    { range: "70–89%", count: 12 },
-    { range: "90–100%", count: 3 },
-  ];
+const ScoreDistributionChart = ({ teacherId }) => {
+  const [scoreBuckets, setScoreBuckets] = useState([
+    { range: "0–49%", count: 0 },
+    { range: "50–69%", count: 0 },
+    { range: "70–89%", count: 0 },
+    { range: "90–100%", count: 0 },
+  ]);
+
+  useEffect(() => {
+    if (!teacherId) return;
+
+    fetch(`http://localhost:5000/api/score_distribution/${teacherId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur réseau");
+        return res.json();
+      })
+      .then((data) => {
+        const buckets = [
+          { range: "0–49%", count: data["0-49"] || 0 },
+          { range: "50–69%", count: data["50-69"] || 0 },
+          { range: "70–89%", count: data["70-89"] || 0 },
+          { range: "90–100%", count: data["90-100"] || 0 },
+        ];
+        setScoreBuckets(buckets);
+      })
+      .catch((err) =>
+        console.error("Error fetching score distribution", err)
+      );
+  }, [teacherId]);
 
   const data = {
     labels: scoreBuckets.map((b) => b.range),
@@ -25,7 +47,7 @@ const ScoreDistributionChart = () => {
       {
         label: "Nombre d'élèves",
         data: scoreBuckets.map((b) => b.count),
-        backgroundColor: "rgba(255, 159, 64, 0.7)", 
+        backgroundColor: "rgba(255, 159, 64, 0.7)",
         borderRadius: 8,
       },
     ],
@@ -44,7 +66,9 @@ const ScoreDistributionChart = () => {
     scales: {
       y: {
         beginAtZero: true,
-        stepSize: 1,
+        ticks: {
+          stepSize: 1,
+        },
         title: {
           display: true,
           text: "Nombre d'élèves",

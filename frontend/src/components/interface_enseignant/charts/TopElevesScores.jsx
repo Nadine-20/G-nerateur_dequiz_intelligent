@@ -1,6 +1,4 @@
-
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,22 +10,6 @@ import {
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-
-const allStudents = [
-  { name: "Antoine Dubois", score: 95 },
-  { name: "Lucas Bernard", score: 92 },
-  { name: "Camille Robert", score: 89 },
-  { name: "Emilie Lefevre", score: 87 },
-  { name: "Sarah Morel", score: 85 },
-  { name: "Amine Barka", score: 70 },
-  { name: "Salim Youssef", score: 66 },
-  { name: "Fatima Zohra", score: 61 },
-  { name: "Tarek Gharbi", score: 55 },
-  { name: "Aya Ferjani", score: 48 },
-  { name: "Rania Hamdi", score: 43 },
-  { name: "Yassine Guez", score: 39 },
-];
 
 const createChartData = (students) => ({
   labels: students.map((s) => s.name),
@@ -56,27 +38,35 @@ const options = {
     x: {
       beginAtZero: true,
       max: 100,
-      ticks: {
-        callback: (value) => `${value}%`,
-      },
-      title: {
-        display: true,
-        text: "Score",
-      },
+      ticks: { callback: (value) => `${value}%` },
+      title: { display: true, text: "Score" },
     },
     y: {
-      title: {
-        display: true,
-        text: "Élève",
-      },
+      title: { display: true, text: "Élève" },
     },
   },
 };
 
-const TopAndLowElevesScores = () => {
-  const sorted = [...allStudents].sort((a, b) => b.score - a.score);
-  const top5 = sorted.slice(0, 5);
-  const low5 = sorted.slice(-5).reverse();
+const TopAndLowElevesScores = ({ teacherId }) => {
+  const [top5, setTop5] = useState([]);
+  const [low5, setLow5] = useState([]);
+
+  useEffect(() => {
+    if (!teacherId) return;
+
+    fetch(`http://localhost:5000/api/top_and_low_students/${teacherId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur réseau");
+        return res.json();
+      })
+      .then((data) => {
+        setTop5(data.top_5 || []);
+        setLow5(data.low_5 || []);
+      })
+      .catch((err) =>
+        console.error("Error fetching student scores", err)
+      );
+  }, [teacherId]);
 
   return (
     <div style={{ display: "flex", gap: "30px", flexWrap: "wrap", justifyContent: "center" }}>
@@ -86,7 +76,7 @@ const TopAndLowElevesScores = () => {
       </div>
 
       <div style={{ width: "450px" }}>
-        <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Dérniers 5 élèves</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Derniers 5 élèves</h3>
         <Bar data={createChartData(low5)} options={options} />
       </div>
     </div>
