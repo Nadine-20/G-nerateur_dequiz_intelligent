@@ -10,6 +10,7 @@ from controllers.editProfile_controller import edit_profile, init_edit_profile_c
 from controllers.quizController import quiz_bp, init_quiz_controller
 from controllers.login_controller import login, init_login_controller
 from controllers.signup_controller import signup, init_signup_controller
+from controllers.creationQuizController import create_quiz, init_quiz_controller
 
 
 load_dotenv()
@@ -33,6 +34,7 @@ init_edit_profile_controller(mongo)
 init_login_controller(mongo)
 init_quiz_controller(mongo)
 init_signup_controller(mongo)
+init_quiz_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -53,6 +55,10 @@ def handle_login():
 @app.route("/api/signup", methods=["POST"])
 def handle_signup():
     return signup()
+
+@app.route("/api/create-quiz", methods=["POST"])
+def handle_create_quiz():
+    return create_quiz()
 
 # Debug endpoint to check users
 @app.route("/api/debug/users", methods=["GET"])
