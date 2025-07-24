@@ -8,6 +8,8 @@ import DashboardStudent from '../components/DashboardSuivProgresionApprenan/Dash
 import DashboardTeacher from '../components/interface_enseignant/dashboard'
 import Login from '../components/auth/login/Login'
 import SignUp from '../components/auth/register/SignUp'
+import MyQuizzesPage from '../pages/MyQuizzesPage'
+import EditQuizPage from '../pages/EditQuizPage'
 
 function AllRoutes() {
     return (
@@ -16,6 +18,8 @@ function AllRoutes() {
             <Route path='/quizzes' element={<QuizzesPage />} />
             <Route path='/edit-profile' element={<EditProfilePage />} />
             <Route path="/teacher/quizzes/create" element={<QuizCreatorPage />} />
+            <Route path="/teacher/quizzes" element={<MyQuizzesPage />} />
+            <Route path="/edit-quiz/:quizId" element={<EditQuizPage />} />
             <Route path="/student/dashboard" element={<DashboardStudent />} />
             <Route path="/teacher/dashboard" element={<DashboardTeacher />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -25,5 +29,6 @@ function AllRoutes() {
         </Routes>
     )
 }
+
 
 export default AllRoutes

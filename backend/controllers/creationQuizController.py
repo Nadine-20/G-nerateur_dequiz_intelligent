@@ -4,46 +4,83 @@ from datetime import datetime
 
 mongo = None
 quizzes = None
+users = None  # Add users collection reference
 
 def init_quiz_controller(mongo_instance):
-    global mongo, quizzes
+    global mongo, quizzes, users
     mongo = mongo_instance
     quizzes = mongo.db["quizzes"]
+    users = mongo.db["users"]  # Initialize users collection
+
 
 def create_quiz():
-    data = request.get_json()
-    
-    # Required fields validation
-    required_fields = ["title", "createdBy", "subject", "questions"]
-    for field in required_fields:
-        if not data.get(field):
-            return jsonify({"message": f"{field} is required"}), 400
-    
-    # Questions validation
-    if len(data["questions"]) == 0:
-        return jsonify({"message": "At least one question is required"}), 400
-    
-    # Create quiz document
-    quiz = {
-        "title": data["title"],
-        "description": data.get("description", ""),
-        "createdBy": data["createdBy"],
-        "createdAt": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "isPublic": data.get("isPublic", False),
-        "subject": data["subject"],
-        "topics": data.get("topics", []),
-        "difficulty": data.get("difficulty", "medium"),
-        "timeLimit": data.get("timeLimit", 1800),  # Default 30 minutes
-        "maxScore": data.get("maxScore", 100),
-        "questions": data["questions"],
-        "attempts": []  # Initialize empty attempts array
-    }
-    
-    # Insert into database
-    quizzes.insert_one(quiz)
-    quiz["_id"] = str(quiz["_id"])  # Convert ObjectId to string
-    
-    return jsonify({
-        "message": "Quiz created successfully",
-        "quiz": quiz
-    }), 201
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON payload"}), 400
+
+        # Validate teacher ID as ObjectId string
+        created_by_str = data.get("createdBy")
+        if not created_by_str or not ObjectId.is_valid(created_by_str):
+            return jsonify({
+                "error": "Invalid teacher ID format",
+                "message": "Teacher ID must be a valid 24-character MongoDB ObjectId string"
+            }), 400
+
+        teacher_id = ObjectId(created_by_str)
+
+        # Validate required fields
+        required_fields = ["title", "subject", "questions"]
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"{field} is required"}), 400
+
+        # Validate questions list
+        if not isinstance(data["questions"], list) or len(data["questions"]) == 0:
+            return jsonify({"error": "At least one question is required"}), 400
+
+        quiz = {
+            "title": data["title"],
+            "description": data.get("description", ""),
+            "createdBy": teacher_id,
+            "createdAt": datetime.utcnow(),
+            "isPublic": data.get("isPublic", False),
+            "subject": data["subject"],
+            "topics": data.get("topics", []),
+            "difficulty": data.get("difficulty", "medium"),
+            "timeLimit": data.get("timeLimit", 1800),
+            "maxScore": data.get("maxScore", 100),
+            "questions": data["questions"],
+            "attempts": []
+        }
+
+        result = quizzes.insert_one(quiz)
+        inserted_quiz_id = result.inserted_id
+
+        update_result = users.update_one(
+            {"_id": teacher_id},
+            {"$push": {"customQuizzes": inserted_quiz_id}}
+        )
+
+        if update_result.matched_count == 0:
+            quizzes.delete_one({"_id": inserted_quiz_id})
+            return jsonify({
+                "error": "Teacher not found",
+                "message": "Quiz was created but couldn't find teacher to associate with"
+            }), 404
+
+        # Prepare response: convert ObjectIds to strings
+        quiz["_id"] = str(inserted_quiz_id)
+        quiz["createdBy"] = str(teacher_id)
+        quiz["createdAt"] = quiz["createdAt"].strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        return jsonify({
+            "message": "Quiz created and added to teacher's collection",
+            "quiz": quiz
+        }), 201
+
+    except Exception as e:
+        return jsonify({
+            "error": "Internal server error",
+            "details": str(e)
+        }), 500

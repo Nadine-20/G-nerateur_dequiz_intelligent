@@ -11,6 +11,7 @@ from controllers.quizController import quiz_bp, init_quiz
 from controllers.login_controller import login, init_login_controller
 from controllers.signup_controller import signup, init_signup_controller
 from controllers.creationQuizController import create_quiz, init_quiz_controller
+from controllers.myQuizzesController import init_my_quizzes_controller, my_quizzes_bp
 
 
 load_dotenv()
@@ -36,10 +37,12 @@ init_quiz_controller(mongo)
 init_signup_controller(mongo)
 init_quiz_controller(mongo)
 init_quiz(mongo)
+init_my_quizzes_controller(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
 app.register_blueprint(quiz_bp)
+app.register_blueprint(my_quizzes_bp)
 
 @app.route("/upload", methods=["POST"])
 def handle_upload():

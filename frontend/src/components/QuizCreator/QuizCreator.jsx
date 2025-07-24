@@ -94,6 +94,11 @@ const QuizCreator = () => {
 
   // Save entire quiz to backend
   const saveQuiz = async () => {
+    if (!userInfo || !userInfo._id) {
+      toast.error('You must be logged in to create a quiz.');
+      return;
+    }
+
     if (quiz.title.trim() === '') {
       alert('Quiz title cannot be empty');
       return;
@@ -104,16 +109,22 @@ const QuizCreator = () => {
       return;
     }
 
+    // Make sure createdBy is current user ID (valid ObjectId string)
+    const quizToSend = {
+      ...quiz,
+      createdBy: userInfo._id,
+    };
+
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/create-quiz', quiz);
-
+      const response = await axios.post('http://localhost:5000/api/create-quiz', quizToSend);
       toast.success('Quiz saved successfully!');
 
       setQuiz({
         title: '',
         description: '',
+        createdBy: userInfo._id,
         subject: 'mathématiques',
         isPublic: true,
         topics: [],
@@ -129,6 +140,7 @@ const QuizCreator = () => {
       setIsSubmitting(false);
     }
   };
+
 
   const removeQuestion = (index) => {
     const updatedQuestions = quiz.questions.filter((_, i) => i !== index);
