@@ -41,7 +41,7 @@ header h1 {
   color: var(--text);
   opacity: 0;
   transform: translateX(-30px);
-  animation: fadeSlideIn 1.5s ease-out forwards;
+  animation: fadeSlideIn 2s ease-out forwards;
 }
 
 
