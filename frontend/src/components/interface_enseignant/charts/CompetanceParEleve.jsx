@@ -1,151 +1,181 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Chart as ChartJS,
-    RadialLinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Tooltip,
-    Legend,
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
 } from "chart.js";
-import { Radar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+const QuizBarChartWithRollList = ({ teacherId }) => {
+  const [quizzes, setQuizzes] = useState([]);
+  const [selectedQuizId, setSelectedQuizId] = useState("");
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
 
+  useEffect(() => {
+    if (!teacherId) return;
 
-const fakeDatabase = {
-    "Classe A": {
-        "Emilie Lefevre": [82, 70, 78, 65, 85, 74],
-        "Antoine Dubois": [60, 90, 68, 72, 80, 60],
+    fetch(`http://localhost:5000/api/quiz_scores/${teacherId}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erreur réseau");
+        }
+        return res.json();
+      })
+      .then((quizList) => {
+        setQuizzes(quizList);
+        if (quizList.length > 0) {
+          setSelectedQuizId(quizList[0].quizId);
+          setSelectedQuiz(quizList[0]);
+          if (quizList[0].scores.length > 0) {
+            setSelectedStudentId(quizList[0].scores[0].userId);
+          }
+        }
+      })
+      .catch((err) =>
+        console.error("Erreur lors du chargement des quiz:", err)
+      );
+  }, [teacherId]);
+
+  useEffect(() => {
+    const quiz = quizzes.find((q) => q.quizId === selectedQuizId);
+    setSelectedQuiz(quiz);
+    if (quiz && quiz.scores.length > 0) {
+      setSelectedStudentId(quiz.scores[0].userId);
+    }
+  }, [selectedQuizId, quizzes]);
+
+  if (!selectedQuiz || selectedQuiz.scores.length === 0) {
+    return <p>Aucune donnée disponible pour ce quiz.</p>;
+  }
+
+  const selectedStudent = selectedQuiz.scores.find(
+    (s) => s.userId === selectedStudentId
+  );
+
+  const chartData = {
+    labels: [selectedStudent?.name || "Inconnu"],
+    datasets: [
+      {
+        label: "Score (%)",
+        data: [selectedStudent?.percentage || 0],
+        backgroundColor:
+          selectedStudent?.percentage >= 50
+            ? "rgba(75, 192, 192, 0.7)"
+            : "rgba(255, 99, 132, 0.7)",
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.raw}%`,
+        },
+      },
     },
-    "Classe B": {
-        "Lucas Bernard": [45, 55, 50, 60, 40, 70],
-        "Camille Robert": [90, 85, 88, 92, 80, 89],
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        title: {
+          display: true,
+          text: "Score (%)",
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Élève",
+        },
+      },
     },
+  };
+
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <h3 style={{ marginBottom: "10px" }}>Score d’un élève</h3>
+
+      {/* Quiz Dropdown */}
+      <div style={{ marginBottom: "15px" }}>
+        <label htmlFor="quiz-select" style={{ fontWeight: "bold" }}>
+          Sélectionnez un quiz :
+        </label>
+        <select
+          id="quiz-select"
+          value={selectedQuizId}
+          onChange={(e) => setSelectedQuizId(e.target.value)}
+          style={{ marginLeft: "10px", padding: "6px", borderRadius: "6px" }}
+        >
+          {quizzes.map((quiz) => (
+            <option key={quiz.quizId} value={quiz.quizId}>
+              {quiz.title} ({quiz.subject})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Student Dropdown */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="student-select" style={{ fontWeight: "bold" }}>
+          Sélectionnez un élève :
+        </label>
+        <select
+          id="student-select"
+          value={selectedStudentId}
+          onChange={(e) => setSelectedStudentId(e.target.value)}
+          style={{ marginLeft: "10px", padding: "6px", borderRadius: "6px" }}
+        >
+          {selectedQuiz.scores.map((student) => (
+            <option key={student.userId} value={student.userId}>
+              {student.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Chart */}
+      <Bar data={chartData} options={chartOptions} />
+
+      {/* Selected Student Info */}
+      <div style={{ marginTop: "30px" }}>
+        <h4>Détails de l’élève sélectionné :</h4>
+        {selectedStudent ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "12px",
+              borderRadius: "8px",
+              backgroundColor:
+                selectedStudent.percentage >= 50 ? "#d4edda" : "#f8d7da",
+              color:
+                selectedStudent.percentage >= 50 ? "#155724" : "#721c24",
+              fontWeight: "bold",
+              fontSize: "16px",
+            }}
+          >
+            <span>{selectedStudent.name}</span>
+            <span>
+              {selectedStudent.percentage}%{" "}
+              {selectedStudent.percentage >= 50 ? "✅ Réussi" : "❌ Échoué"}
+            </span>
+          </div>
+        ) : (
+          <p>Aucun élève sélectionné.</p>
+        )}
+      </div>
+    </div>
+  );
 };
 
-const RadarSkillsChart = () => {
-    const classList = Object.keys(fakeDatabase);
-    const [selectedClass, setSelectedClass] = useState(classList[0]);
-    const [selectedStudent, setSelectedStudent] = useState(
-        Object.keys(fakeDatabase[classList[0]])[0]
-    );
-
-    const handleClassChange = (e) => {
-        const newClass = e.target.value;
-        const firstStudent = Object.keys(fakeDatabase[newClass])[0];
-        setSelectedClass(newClass);
-        setSelectedStudent(firstStudent);
-    };
-
-    const handleStudentChange = (e) => {
-        setSelectedStudent(e.target.value);
-    };
-
-    const studentSkills = fakeDatabase[selectedClass][selectedStudent];
-    const average = studentSkills.reduce((sum, val) => sum + val, 0) / studentSkills.length;
-
-
-    const data = {
-        labels: [
-            "Mathématiques",
-            "Langue",
-            "Logique",
-            "Créativité",
-            "Résolution de problèmes",
-            "Mémoire",
-        ],
-        datasets: [
-            {
-                label: selectedStudent,
-                data: studentSkills,
-                backgroundColor: "rgba(54, 162, 235, 0.2)",
-                borderColor: "rgba(54, 162, 235, 1)",
-                pointBackgroundColor: "rgba(54, 162, 235, 1)",
-                borderWidth: 2,
-                fill: true,
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        scales: {
-            r: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                    stepSize: 20,
-                    callback: (value) => `${value}%`,
-                },
-                pointLabels: {
-                    font: {
-                        size: 14,
-                    },
-                },
-            },
-        },
-        plugins: {
-            legend: {
-                position: "top",
-            },
-            tooltip: {
-                callbacks: {
-                    label: (context) => `${context.raw}%`,
-                },
-            },
-        },
-    };
-
-    return (
-        <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-            <h3 style={{ marginBottom: "10px" }}>Profil de compétences</h3>
-
-            <div style={{ marginBottom: "15px" }}>
-                <label htmlFor="class-select" style={{ fontWeight: "bold" }}>
-                    Classe :
-                </label>
-                <select
-                    id="class-select"
-                    value={selectedClass}
-                    onChange={handleClassChange}
-                    style={{ margin: "0 10px", padding: "6px", borderRadius: "6px" }}
-                >
-                    {classList.map((classe) => (
-                        <option key={classe} value={classe}>
-                            {classe}
-                        </option>
-                    ))}
-                </select>
-
-                <label htmlFor="student-select" style={{ fontWeight: "bold" }}>
-                    Élève :
-                </label>
-                <select
-                    id="student-select"
-                    value={selectedStudent}
-                    onChange={handleStudentChange}
-                    style={{ marginLeft: "10px", padding: "6px", borderRadius: "6px" }}
-                >
-                    {Object.keys(fakeDatabase[selectedClass]).map((student) => (
-                        <option key={student} value={student}>
-                            {student}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <Radar data={data} options={options} /><br />
-            <div style={{ textAlign: "center", fontSize: "18px", fontWeight: "bold" }}>
-                Moyenne de {selectedStudent} : {average.toFixed(2)}%
-            </div>
-
-        </div>
-    );
-};
-
-export default RadarSkillsChart;
-
-
-
+export default QuizBarChartWithRollList;

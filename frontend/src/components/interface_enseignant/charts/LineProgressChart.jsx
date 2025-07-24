@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   LineElement,
@@ -11,28 +10,45 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
-const LineProgressChart = () => {
-  const data = {
-    labels: [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ],
-    datasets: [
-      {
-        label: "Performance moyenne",
-        data: [12, 28, 40, 25, 45, 65, 58, 66, 41, 63, 78, 85],
-        fill: false,
-        borderColor: "#1e64f0",
-        backgroundColor: "#1e64f0",
-        tension: 0.3,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      }
-    ]
-  };
+const LineProgressChart = ({ teacherId }) => {
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: []
+  });
+
+  useEffect(() => {
+    if (!teacherId) return;
+
+    fetch(`http://localhost:5000/api/monthly_performance/${teacherId}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erreur réseau");
+        }
+        return res.json();
+      })
+      .then(({ labels, data }) => {
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: "Performance moyenne",
+              data,
+              fill: false,
+              borderColor: "#1e64f0",
+              backgroundColor: "#1e64f0",
+              tension: 0.3,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+            }
+          ]
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching monthly performance:", error);
+      });
+  }, [teacherId]);
 
   const options = {
     responsive: true,
@@ -71,7 +87,7 @@ const LineProgressChart = () => {
       <h3 style={{ textAlign: "left", marginBottom: "10px" }}>
         Performance des élèves
       </h3>
-      <Line data={data} options={options} />
+      <Line data={chartData} options={options} />
     </div>
   );
 };
