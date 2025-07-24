@@ -5,11 +5,11 @@ import ScoreDistrubtion from "./charts/ScoreDistributionChart";
 import CompetanceEleve from "./charts/CompetanceParEleve";
 import "./dashboard.css";
 import profilIcon from "./images/profil.png";
-// import Total_Students from "./data/totalStudents";
-// import Total_quiz from "./data/totalQuiz";
-// import SuccessRate from "./data/successRate";
-// import Last_Activities_Table from "./data/LastActivitiesTable";
-// import Teacher_Name from "./data/Teacher_Name";
+import Total_Students from "./data/totalStudents";
+import Total_quiz from "./data/totalQuiz";
+import SuccessRate from "./data/successRate";
+import Last_Activities_Table from "./data/LastActivitiesTable";
+import Teacher_Name from "./data/Teacher_Name";
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState("line");
