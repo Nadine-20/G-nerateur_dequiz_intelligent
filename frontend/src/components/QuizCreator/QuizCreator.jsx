@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './QuizCreator.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const QuizCreator = () => {
 
@@ -10,6 +11,8 @@ const QuizCreator = () => {
     const storedUser = localStorage.getItem('userInfo');
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
+  const navigate = useNavigate();
 
   const [quiz, setQuiz] = useState({
     title: '',
@@ -173,6 +176,17 @@ const QuizCreator = () => {
           <p className="subtitle">Build engaging quizzes for your audience</p>
         </div>
         <div className="header-actions">
+          <button
+            className="ai-generate-btn"
+            onClick={() => navigate('/teacher/quizzes/create/ai')}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M18 8l2 2l4-4"></path>
+            </svg>
+            AI Generator
+          </button>
           <button className="preview-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

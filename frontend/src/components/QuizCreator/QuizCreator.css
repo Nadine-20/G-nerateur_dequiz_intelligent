@@ -597,3 +597,44 @@ button {
     padding: 1.5rem 1rem;
   }
 }
+
+/* Add to your existing CSS */
+.ai-generate-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.ai-generate-btn:hover {
+  background-color: #0e9f6e;
+  transform: translateY(-1px);
+}
+
+.ai-generate-btn svg {
+  stroke-width: 2;
+}
+
+/* Adjust header actions to accommodate new button */
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* For smaller screens */
+@media (max-width: 768px) {
+  .header-actions {
+    flex-wrap: wrap;
+  }
+  
+  .header-actions button {
+    flex: 1;
+    min-width: 120px;
+  }
+}

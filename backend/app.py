@@ -12,6 +12,8 @@ from controllers.login_controller import login, init_login_controller
 from controllers.signup_controller import signup, init_signup_controller
 from controllers.creationQuizController import create_quiz, init_quiz_controller
 from controllers.myQuizzesController import init_my_quizzes_controller, my_quizzes_bp
+from controllers.ai_quiz_controller import init_ai_quiz_controller, generate_quiz_with_ai
+
 
 
 load_dotenv()
@@ -33,11 +35,14 @@ except Exception as e:
 init_apprenant_controller(mongo)
 init_edit_profile_controller(mongo)
 init_login_controller(mongo)
-init_quiz_controller(mongo)
 init_signup_controller(mongo)
 init_quiz_controller(mongo)
 init_quiz(mongo)
 init_my_quizzes_controller(mongo)
+openai_api_key = os.getenv("OPENROUTER_API_KEY")
+if not openai_api_key:
+    raise ValueError("OPENROUTER_API_KEY environment variable is not set.")
+init_ai_quiz_controller(mongo, openai_api_key)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
@@ -64,6 +69,10 @@ def handle_signup():
 def handle_create_quiz():
     return create_quiz()
 
+
+@app.route("/quizzes/generate", methods=["POST", "OPTIONS"])
+def generate_quiz():
+    return generate_quiz_with_ai()
 # Debug endpoint to check users
 @app.route("/api/debug/users", methods=["GET"])
 def debug_users():
