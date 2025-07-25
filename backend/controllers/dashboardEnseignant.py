@@ -139,7 +139,6 @@ def get_top_and_low_students(teacher_id):
             if student_id is None or score is None:
                 continue
 
-            # Convert student_id to ObjectId if it's a string and valid
             try:
                 if not isinstance(student_id, ObjectId) and ObjectId.is_valid(student_id):
                     student_oid = ObjectId(student_id)
@@ -148,7 +147,6 @@ def get_top_and_low_students(teacher_id):
             except Exception:
                 continue
 
-            # Check or update max score for each student
             if student_oid not in students_scores or students_scores[student_oid]["score"] < score:
                 student_doc = users.find_one({"_id": student_oid})
                 name = student_doc.get("name") if student_doc else "Inconnu"
@@ -186,7 +184,6 @@ def get_score_distribution(teacher_id):
             if percentage is None:
                 continue
 
-            # Count attempts in buckets
             if 0 <= percentage < 50:
                 buckets["0-49"] += 1
             elif 50 <= percentage < 70:

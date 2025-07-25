@@ -19,10 +19,8 @@ const Dashboard = () => {
         const storedUser = localStorage.getItem('userInfo');
         return storedUser ? JSON.parse(storedUser) : null;
     });
-    // Get teacher and user ID from localStorage
     const teacherId = userInfo ? userInfo._id : null;
 
-    // Optional fallback if not logged in
     if (!teacherId) {
         return <p>Vous devez vous connecter pour accéder au tableau de bord.</p>;
     }
