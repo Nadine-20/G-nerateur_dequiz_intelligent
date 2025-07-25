@@ -13,7 +13,7 @@ from controllers.signup_controller import signup, init_signup_controller
 from controllers.creationQuizController import create_quiz, init_quiz_controller
 from controllers.myQuizzesController import init_my_quizzes_controller, my_quizzes_bp
 from controllers.ai_quiz_controller import init_ai_quiz_controller, generate_quiz_with_ai
-
+from controllers.dashboardEnseignant import dashboard_teacher_bp, init_dashboard_teacher
 
 
 load_dotenv()
@@ -43,11 +43,13 @@ openai_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openai_api_key:
     raise ValueError("OPENROUTER_API_KEY environment variable is not set.")
 init_ai_quiz_controller(mongo, openai_api_key)
+init_dashboard_teacher(mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
 app.register_blueprint(quiz_bp)
 app.register_blueprint(my_quizzes_bp)
+app.register_blueprint(dashboard_teacher_bp)
 
 @app.route("/upload", methods=["POST"])
 def handle_upload():

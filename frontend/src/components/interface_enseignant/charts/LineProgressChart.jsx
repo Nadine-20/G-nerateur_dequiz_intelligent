@@ -22,13 +22,16 @@ const LineProgressChart = ({ teacherId }) => {
     if (!teacherId) return;
 
     fetch(`http://localhost:5000/api/monthly_performance/${teacherId}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Erreur réseau");
-        }
+      .then(res => {
+        if (!res.ok) throw new Error("Network error");
         return res.json();
       })
-      .then(({ labels, data }) => {
+      .then(result => {
+        const monthlyPerformance = result.monthly_performance || [];
+
+        const labels = monthlyPerformance.map(item => item._id);
+        const data = monthlyPerformance.map(item => item.count);
+
         setChartData({
           labels,
           datasets: [
@@ -45,10 +48,11 @@ const LineProgressChart = ({ teacherId }) => {
           ]
         });
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error fetching monthly performance:", error);
       });
   }, [teacherId]);
+
 
   const options = {
     responsive: true,

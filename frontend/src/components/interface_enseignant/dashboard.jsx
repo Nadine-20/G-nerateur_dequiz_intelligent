@@ -14,8 +14,13 @@ import Teacher_Name from "./data/Teacher_Name";
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState("line");
 
+
+    const [userInfo, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
     // Get teacher and user ID from localStorage
-    const teacherId = localStorage.getItem("teacherId");
+    const teacherId = userInfo ? userInfo._id : null;
 
     // Optional fallback if not logged in
     if (!teacherId) {
@@ -27,7 +32,7 @@ const Dashboard = () => {
             <main>
                 <header>
                     <h1>
-                        Bonjour , Professeur <Teacher_Name teacher_id={teacherId} />
+                        Bonjour , Professeur {userInfo ? userInfo.firstName : "Inconnu"}
                     </h1>
                     <img src={profilIcon} alt="Profil" />
                 </header>
@@ -44,7 +49,8 @@ const Dashboard = () => {
                                 <li id="nb_cour">
                                     Total des quizzes
                                     <br />
-                                    <br /> <Total_quiz teacherId={teacherId} />
+                                    <br />
+                                    <Total_quiz teacherId={teacherId} />
                                 </li>
                                 <li id="tx_reuss">
                                     Taux de réussite
@@ -86,7 +92,7 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    <Last_Activities_Table teacherId={teacherId} />
+                    {/* <Last_Activities_Table teacherId={teacherId} /> */}
                 </section>
             </main>
         </div>

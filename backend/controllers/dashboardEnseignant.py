@@ -1,49 +1,51 @@
-from flask import Flask,jsonify
-from pymongo import MongoClient
-from flask_cors import CORS
-from datetime import datetime, timedelta
+from flask import Blueprint, jsonify
+from bson import ObjectId
+from datetime import datetime
 from dateutil import parser
 
-app = Flask(__name__)
-CORS(app)
+dashboard_teacher_bp = Blueprint('dashboard_teacher', __name__, url_prefix='/api')
 
-client = MongoClient("mongodb+srv://youssefbenothmen285:cQQO0P0Hr6mOo2Ej@cluster0.8dkqhcy.mongodb.net/")
-db = client["platforme_quiz"]
+mongo = None
+users = None
+quizzes = None
 
+def init_dashboard_teacher(mongo_instance):
+    global mongo, users, quizzes
+    mongo = mongo_instance
+    users = mongo.db["users"]
+    quizzes = mongo.db["quizzes"]
 
-@app.route('/api/total_students', methods=['GET']) 
+@dashboard_teacher_bp.route('/total_students', methods=['GET']) 
 def get_total_students():
-    users_collection = db["users"]
-    total = users_collection.count_documents({"role": "student"})
+    total = users.count_documents({"role": "student"})
     return jsonify({"total_students": total})
 
-@app.route('/api/total_quiz/<teacher_id>', methods=['GET']) 
-def get_total_cours(teacher_id):
-    quiz_collection = db["quizzes"]
-    total_quiz = quiz_collection.count_documents({"createdBy":teacher_id})
+
+@dashboard_teacher_bp.route('/total_quiz/<teacher_id>', methods=['GET']) 
+def get_total_quiz(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
+    total_quiz = quizzes.count_documents({"createdBy": ObjectId(teacher_id)})
     return jsonify({"total_quiz": total_quiz})
 
 
-@app.route('/api/success_rate/<teacher_id>', methods=['GET'])
+@dashboard_teacher_bp.route('/success_rate/<teacher_id>', methods=['GET'])
 def get_success_rate(teacher_id):
-    quizzes_collection = db["quizzes"]
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
 
-    # Get all quizzes created by this teacher
-    quizzes = list(quizzes_collection.find(
-        {"createdBy": teacher_id},
+    teacher_quizzes = quizzes.find(
+        {"createdBy": ObjectId(teacher_id)},
         {"attempts": 1, "maxScore": 1}
-    ))
-
-    if not quizzes:
-        return jsonify({"success_rate": 0, "message": "No quizzes found for this teacher."})
+    )
 
     total_attempts = 0
     total_passes = 0
 
-    for quiz in quizzes:
+    for quiz in teacher_quizzes:
         attempts = quiz.get("attempts", [])
-        max_score = quiz.get("maxScore", 100)  
-        passing_score = max_score * 0.5  
+        max_score = quiz.get("maxScore", 100)
+        passing_score = max_score * 0.5
 
         for attempt in attempts:
             total_attempts += 1
@@ -54,233 +56,194 @@ def get_success_rate(teacher_id):
         return jsonify({"success_rate": 0, "message": "No quiz attempts found for this teacher."})
 
     success_rate = (total_passes / total_attempts) * 100
-
     return jsonify({"success_rate": round(success_rate, 2)})
 
 
-@app.route('/api/monthly_performance/<teacher_id>', methods=['GET'])
-def get_monthly_quiz_performance(teacher_id):
-    quizzes_collection = db["quizzes"]
+@dashboard_teacher_bp.route('/teacher_name/<teacher_id>', methods=['GET'])
+def get_teacher_name(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
 
-    now = datetime.now()
-    quiz_data = {}
-
-    for i in range(11, -1, -1):
-        month = (now - timedelta(days=30 * i)).strftime('%Y-%m')
-        quiz_data[month] = []
-
-    quizzes = quizzes_collection.find(
-        {"createdBy": teacher_id},
-        {"createdAt": 1, "attempts": 1}
+    teacher = users.find_one(
+        {"_id": ObjectId(teacher_id), "role": "teacher"},
+        {"name": 1}
     )
+    if not teacher:
+        return jsonify({"error": "Teacher not found"}), 404
 
-    for quiz in quizzes:
-        raw_date = quiz.get("createdAt")
-        try:
-            created_date = parser.parse(raw_date) if isinstance(raw_date, str) else raw_date
-            month_label = created_date.strftime('%Y-%m')
-        except Exception:
-            continue
+    return jsonify({"name": teacher["name"]})
 
-        if month_label not in quiz_data:
-            continue 
 
-        attempts = quiz.get("attempts", [])
-        percentages = [a.get("percentage", 0) for a in attempts if "percentage" in a]
-        if not percentages:
-            continue 
+@dashboard_teacher_bp.route('/monthly_performance/<teacher_id>', methods=['GET'])
+def get_monthly_performance(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
 
-        average = round(sum(percentages) / len(percentages), 2)
+    pipeline = [
+        {"$match": {"createdBy": ObjectId(teacher_id)}},
+        {"$group": {
+            "_id": {"$substr": ["$createdAt", 0, 7]},
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    results = list(quizzes.aggregate(pipeline))
+    return jsonify({"monthly_performance": results})
 
-        quiz_data[month_label].append(average)
 
-    result = {
-        "labels": [],
-        "data": []
-    }
-
-    for month in sorted(quiz_data.keys()):
-        monthly_quiz_averages = quiz_data[month]
-        month_avg = round(sum(monthly_quiz_averages) / len(monthly_quiz_averages), 2) if monthly_quiz_averages else 0
-        result["labels"].append(month)
-        result["data"].append(month_avg)
-
-    return jsonify(result)
-
-@app.route('/api/top_and_low_students/<teacher_id>', methods=['GET'])
-def get_top_and_low_students(teacher_id):
-    quizzes_collection = db["quizzes"]
-    students_collection = db["users"]  # Assuming students are stored in 'users' collection
-
-    # Fetch all quizzes created by the teacher
-    quizzes = quizzes_collection.find({"createdBy": teacher_id})
-
-    # Dictionary to store the performance of each student
-    student_scores = {}
-
-    for quiz in quizzes:
-        attempts = quiz.get("attempts", [])
-        for attempt in attempts:
-            student_id = attempt.get("userId")
-            score = attempt.get("percentage", 0)
-            # Collecting all quiz attempts by student
-            if student_id not in student_scores:
-                student_scores[student_id] = []
-            student_scores[student_id].append(score)
-
-    # Prepare a list of students with their average scores
-    student_performance = []
-
-    for student_id, scores in student_scores.items():
-        student = students_collection.find_one({"_id": student_id})
-        if not student:
-            continue  # Skip if the student is not found in the database
-        name = f"{student.get('firstName', '')} {student.get('lastName', '')}".strip()
-        average_score = round(sum(scores) / len(scores), 2)
-        student_performance.append({
-            "name": name,
-            "score": average_score
-        })
-
-    # Sort the list by score (descending) to get top and low students
-    student_performance.sort(key=lambda x: x['score'], reverse=True)
-
-    # Get top 5 and bottom 5 students
-    top_5 = student_performance[:5]
-    low_5 = student_performance[-5:][::-1]  # Reverse for bottom 5 sorted from low to high
-
-    # Return the data
-    result = {
-        "top_5": top_5,
-        "low_5": low_5
-    }
-
-    return jsonify(result)
-
-@app.route('/api/score_distribution/<teacher_id>', methods=['GET'])
-def scoreDistribution(teacher_id):
-    quizzes_collection = db["quizzes"]
-    quizzes = quizzes_collection.find({"createdBy": teacher_id})
-    scoreBuckets = {"0-49":0,"50-69":0,"70-89":0,"90-100":0}
-    for quiz in quizzes:
-        attempts = quiz.get("attempts", [])
-        for attempt in attempts:
-            score = attempt.get("percentage", 0)
-            if score <50:
-                scoreBuckets["0-49"]+=1
-            elif score <70:
-                scoreBuckets["50-69"]+=1
-            elif score < 90:
-                scoreBuckets["70-89"]+=1
-            else:
-                scoreBuckets["90-100"]+=1
-
-    return jsonify(scoreBuckets)
-
-@app.route('/api/quiz_scores/<teacher_id>', methods=['GET'])
-def get_quiz_scores(teacher_id):
-    quizzes = list(db["quizzes"].find({"createdBy": teacher_id}))
-    users = {user["_id"]: user for user in db["users"].find({"role": "student"})}
-
-    result = []
-
-    for quiz in quizzes:
-        quiz_info = {
-            "quizId": str(quiz["_id"]),
-            "title": quiz["title"],
-            "subject": quiz.get("subject", "Inconnu"),
-            "scores": []
-        }
-
-        for attempt in quiz.get("attempts", []):
-            user_id = attempt.get("userId")
-            percentage = attempt.get("percentage")
-
-            if user_id and percentage is not None and user_id in users:
-                student = users[user_id]
-                full_name = f"{student.get('firstName', '')} {student.get('lastName', '')}"
-                quiz_info["scores"].append({
-                    "userId": user_id,
-                    "name": full_name,
-                    "percentage": percentage
-                })
-
-        result.append(quiz_info)
-
-    return jsonify(result)
-
-@app.route('/api/last_passed_students/<teacher_id>', methods=['GET'])
+@dashboard_teacher_bp.route('/last_passed_students/<teacher_id>', methods=['GET'])
 def get_last_passed_students(teacher_id):
-    quizzes_collection = db["quizzes"]
-    users_collection = db["users"]
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
 
-    # Get all quizzes by this teacher
-    quizzes = list(quizzes_collection.find({"createdBy": teacher_id}))
+    teacher_quizzes = quizzes.find(
+        {"createdBy": ObjectId(teacher_id)},
+        {"attempts": 1, "maxScore": 1}
+    )
+    passed_students = []
 
-    attempts_data = []
-
-    # Collect all passing attempts
-    for quiz in quizzes:
-        subject = quiz.get("subject", "Inconnu")
+    for quiz in teacher_quizzes:
         max_score = quiz.get("maxScore", 100)
         passing_score = max_score * 0.5
 
         for attempt in quiz.get("attempts", []):
-            score = attempt.get("percentage", 0)
-            if score >= passing_score:
-                attempts_data.append({
-                    "userId": attempt.get("userId"),
-                    "subject": subject,
-                    "score": score,
-                    "submittedAt": attempt.get("submittedAt")
+            if attempt.get("percentage", 0) >= passing_score:
+                passed_students.append({
+                    "student_id": str(attempt.get("student_id")),
+                    "percentage": attempt.get("percentage"),
+                    "date": attempt.get("date")
                 })
 
-    # Sort attempts by submittedAt descending (latest first)
-    attempts_data.sort(key=lambda x: x.get("submittedAt", ""), reverse=True)
+    passed_students.sort(key=lambda x: x["date"], reverse=True)
+    return jsonify({"last_passed_students": passed_students[:5]})
 
-    # To avoid duplicate students showing multiple attempts, keep track of included userIds
-    seen_users = set()
-    results = []
+@dashboard_teacher_bp.route('/top_and_low_students/<teacher_id>', methods=['GET'])
+def get_top_and_low_students(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
 
-    for attempt in attempts_data:
-        user_id = attempt["userId"]
-        if user_id in seen_users:
-            continue  # skip duplicates, only latest attempt per user
-        seen_users.add(user_id)
+    teacher_oid = ObjectId(teacher_id)
 
-        # Fetch user info
-        user = users_collection.find_one({"_id": user_id})
-        if not user:
-            continue  # skip if user not found
+    # Use the global quizzes collection instead of db (which is undefined)
+    global quizzes, users
 
-        full_name = f"{user.get('firstName', '')} {user.get('lastName', '')}".strip()
-        # Format date nicely, e.g., "23 avril 2025"
-        try:
-            submitted_date = datetime.strptime(attempt["submittedAt"], "%Y-%m-%dT%H:%M:%SZ")
-            last_activity = submitted_date.strftime("%d %B %Y")  # day, full month name, and year
-        except Exception:
-            last_activity = attempt["submittedAt"]
+    teacher_quizzes = quizzes.find({"createdBy": teacher_oid})
 
-        results.append({
-            "name": full_name,
-            "subject": attempt["subject"],
-            "score": f"{attempt['score']}%",
-            "lastActivity": last_activity
+    students_scores = {}
+
+    for quiz in teacher_quizzes:
+        for attempt in quiz.get("attempts", []):
+            student_id = attempt.get("student_id")
+            score = attempt.get("percentage", 0)
+
+            if student_id is None or score is None:
+                continue
+
+            # Convert student_id to ObjectId if it's a string and valid
+            try:
+                if not isinstance(student_id, ObjectId) and ObjectId.is_valid(student_id):
+                    student_oid = ObjectId(student_id)
+                else:
+                    student_oid = student_id
+            except Exception:
+                continue
+
+            # Check or update max score for each student
+            if student_oid not in students_scores or students_scores[student_oid]["score"] < score:
+                student_doc = users.find_one({"_id": student_oid})
+                name = student_doc.get("name") if student_doc else "Inconnu"
+                students_scores[student_oid] = {"name": name, "score": score}
+
+    students_list = list(students_scores.values())
+
+    top_5 = sorted(students_list, key=lambda x: x["score"], reverse=True)[:5]
+    low_5 = sorted(students_list, key=lambda x: x["score"])[:5]
+
+    return jsonify({
+        "top_5": top_5,
+        "low_5": low_5
+    })
+
+@dashboard_teacher_bp.route('/score_distribution/<teacher_id>', methods=['GET'])
+def get_score_distribution(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
+
+    teacher_oid = ObjectId(teacher_id)
+
+    buckets = {
+        "0-49": 0,
+        "50-69": 0,
+        "70-89": 0,
+        "90-100": 0
+    }
+
+    teacher_quizzes = quizzes.find({"createdBy": teacher_oid}, {"attempts": 1})
+
+    for quiz in teacher_quizzes:
+        for attempt in quiz.get("attempts", []):
+            percentage = attempt.get("percentage")
+            if percentage is None:
+                continue
+
+            # Count attempts in buckets
+            if 0 <= percentage < 50:
+                buckets["0-49"] += 1
+            elif 50 <= percentage < 70:
+                buckets["50-69"] += 1
+            elif 70 <= percentage < 90:
+                buckets["70-89"] += 1
+            elif 90 <= percentage <= 100:
+                buckets["90-100"] += 1
+
+    return jsonify(buckets)
+
+@dashboard_teacher_bp.route('/quiz_scores/<teacher_id>', methods=['GET'])
+def get_quiz_scores(teacher_id):
+    if not ObjectId.is_valid(teacher_id):
+        return jsonify({"error": "Invalid teacher ID"}), 400
+
+    teacher_oid = ObjectId(teacher_id)
+
+    quizzes_cursor = quizzes.find({"createdBy": teacher_oid})
+
+    quiz_list = []
+
+    for quiz in quizzes_cursor:
+        quiz_id = str(quiz["_id"])
+        title = quiz.get("title", "Untitled")
+        subject = quiz.get("subject", "Unknown")
+
+        scores = []
+        for attempt in quiz.get("attempts", []):
+            student_id = attempt.get("student_id")
+            percentage = attempt.get("percentage")
+
+            if student_id is None or percentage is None:
+                continue
+
+            if isinstance(student_id, ObjectId):
+                student_oid = student_id
+            elif isinstance(student_id, str) and ObjectId.is_valid(student_id):
+                student_oid = ObjectId(student_id)
+            else:
+                continue
+
+            student = users.find_one({"_id": student_oid}, {"name": 1})
+            student_name = student["name"] if student else "Inconnu"
+
+            scores.append({
+                "userId": str(student_oid),
+                "name": student_name,
+                "percentage": percentage
+            })
+
+        quiz_list.append({
+            "quizId": quiz_id,
+            "title": title,
+            "subject": subject,
+            "scores": scores
         })
-        if len(results) >= 5:
-            break
 
-    return jsonify(results)   
-
-@app.route('/api/teacher_name/<teacher_id>', methods=["GET"])
-def teacher_name(teacher_id):
-    user_data = db["users"].find_one({"_id": teacher_id})
-    if not user_data:
-        return jsonify({"error": "Teacher not found"}), 404
-    fullname = f"{user_data.get('firstName', '')} {user_data.get('lastName', '')}".strip()
-    return jsonify({"fullname": fullname})
-
-
-if __name__ == '__main__':
-    app.run(debug=True,port=5000)
+    return jsonify(quiz_list)
 

@@ -8,35 +8,36 @@ const SuccessRate = ({ teacherId }) => {
   useEffect(() => {
     if (!teacherId) return;
 
-    setLoading(true);
+    const fetchSuccessRate = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:5000/api/success_rate/${teacherId}`);
+        if (!res.ok) throw new Error("Network response was not ok");
 
-    fetch(`http://localhost:5000/api/success_rate/${teacherId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         if (data.success_rate !== undefined) {
           setSuccessRate(data.success_rate);
         } else {
           setError(data.message || "No data available.");
         }
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching success rate:", error);
+      } catch (err) {
+        console.error("Error fetching success rate:", err);
         setError("Something went wrong while fetching data.");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchSuccessRate();
   }, [teacherId]);
 
   if (loading) return <p style={{ color: "white" }}>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <p style={{ color: "white" }}>{successRate}%</p>
+    <p style={{ color: "white" }}>
+      {successRate !== null ? `${successRate}%` : "No success rate available"}
+    </p>
   );
 };
 
