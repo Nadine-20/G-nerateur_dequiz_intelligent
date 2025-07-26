@@ -34,7 +34,6 @@ def generate_quiz_with_ai():
             if not data.get(field):
                 return jsonify({"error": f"{field} is required"}), 400
 
-        # Define default values
         difficulty = data.get("difficulty", "débutant")
         is_public = data.get("isPublic", True)
         time_limit = data.get("timeLimit", 900)

@@ -46,14 +46,13 @@ def init_user_routes(app, mongo):
             if mongo.db.users.find_one({"email": data['email']}):
                 return jsonify({"error": "Email already exists"}), 400
             
-            # Hash the password before storing
             hashed_password = generate_password_hash(data['password'])
             
             new_user = {
                 "firstName": data['firstName'],
                 "lastName": data['lastName'],
                 "email": data['email'],
-                "password": hashed_password,  # Store the hashed password
+                "password": hashed_password,  
                 "role": data['role'],
                 "gender": data.get('gender', ''),
                 "matiere": data.get('matiere', ''),
@@ -66,7 +65,7 @@ def init_user_routes(app, mongo):
             
             result = mongo.db.users.insert_one(new_user)
             new_user['_id'] = str(result.inserted_id)
-            del new_user['password']  # Don't return the password hash
+            del new_user['password']  
             
             return jsonify(new_user), 201
         except Exception as e:
@@ -120,10 +119,8 @@ def init_user_routes(app, mongo):
             if not ObjectId.is_valid(user_id):
                 return jsonify({"error": "Invalid user ID"}), 400
             
-            # Remove user's custom quizzes first
             mongo.db.quizzes.delete_many({"createdBy": ObjectId(user_id)})
             
-            # Then delete the user
             result = mongo.db.users.delete_one({"_id": ObjectId(user_id)})
             
             if result.deleted_count == 0:
