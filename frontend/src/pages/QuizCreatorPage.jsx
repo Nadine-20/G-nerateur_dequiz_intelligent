@@ -12,7 +12,7 @@ function QuizCreatorPage() {
         return <Redirect />;
     }
 
-    if (userInfo.role !== 'teacher') {
+    if (userInfo.role !== 'teacher' && userInfo.role !== 'admin') {
         return <h3>You must be a teacher to create quizzes</h3>;
     }
     return (

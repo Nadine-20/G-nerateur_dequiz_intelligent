@@ -11,6 +11,12 @@ import SignUp from '../components/auth/register/SignUp'
 import MyQuizzesPage from '../pages/MyQuizzesPage'
 import EditQuizPage from '../pages/EditQuizPage'
 import QuizGenerator from '../components/quizgeneratorAi/QuizGenerator'
+import UserListPage from '../components/Admin/ UserListPage'
+import UserFormPage from '../components/Admin/UserFormPage'
+import UserDetailPage from '../components/Admin/UserDetailPage'
+import QuizListPage from '../components/Admin/QuizListPage'
+import QuizDetailPage from '../components/Admin/QuizDetailPage'
+import QuizEditPage from '../components/Admin/QuizEditPage'
 
 function AllRoutes() {
     return (
@@ -28,6 +34,13 @@ function AllRoutes() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<SignUp />} />
+            <Route path="/users" element={<UserListPage />} />
+            <Route path="/users/new" element={<UserFormPage />} />
+            <Route path="/users/:userId" element={<UserDetailPage />} />
+            <Route path="/users/:userId/edit" element={<UserFormPage editMode={true} />} />
+            <Route path="/admin/quizzes" element={<QuizListPage />} />
+            <Route path="/quizzes/:quizId" element={<QuizDetailPage />} />
+            <Route path="/quizzes/:quizId/edit" element={<QuizEditPage />} />
         </Routes>
     )
 }

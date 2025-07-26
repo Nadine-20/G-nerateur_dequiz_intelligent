@@ -113,11 +113,42 @@ function NavBar() {
 
                             <div className="dropdown-items">
                                 {userInfo.role === "admin" && (
-                                    <Link to="/admin/users" className="dropdown-item" onClick={closeDropdown}>
-                                        <span className="dropdown-icon">👥</span>
-                                        <span>Manage Users</span>
-                                    </Link>
+                                    <>
+                                        {/* Quiz Management */}
+                                        <div className="dropdown-section-header">Quiz Management</div>
+                                        <Link to="teacher/quizzes/create" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">✏️</span>
+                                            <span>Create Quiz</span>
+                                        </Link>
+                                        <Link to="/admin/quizzes" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">📚</span>
+                                            <span>All Quizzes</span>
+                                        </Link>
+                                        <Link to="/teacher/quizzes" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">📝</span>
+                                            <span>My Quizzes</span>
+                                        </Link>
+
+                                        {/* User Management */}
+                                        <div className="dropdown-section-header">User Management</div>
+                                        <Link to="/users" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">👥</span>
+                                            <span>Manage Users</span>
+                                        </Link>
+                                        <Link to="/users/new" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">➕</span>
+                                            <span>Add New User</span>
+                                        </Link>
+
+                                        {/* Analytics */}
+                                        <div className="dropdown-section-header">Analytics</div>
+                                        <Link to="/teacher/dashboard" className="dropdown-item" onClick={closeDropdown}>
+                                            <span className="dropdown-icon">🧑‍🎓</span>
+                                            <span>User Progress</span>
+                                        </Link>
+                                    </>
                                 )}
+
 
                                 {userInfo.role === "teacher" && (
                                     <>

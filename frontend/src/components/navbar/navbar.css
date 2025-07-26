@@ -214,3 +214,108 @@
         right: -10px;
     }
 }
+
+
+
+
+/* Admin Dropdown Menu Styles */
+.dropdown-section-header {
+  padding: 8px 16px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(156, 163, 175, 0.8);
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+.admin-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: rgba(209, 213, 219, 0.95);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  margin: 2px 4px;
+}
+
+.admin-dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: white;
+  transform: translateX(2px);
+}
+
+.admin-dropdown-icon {
+  margin-right: 12px;
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  color: rgba(167, 139, 250, 0.9);
+}
+
+/* Specific item colors */
+.admin-dropdown-item.quizzes {
+  color: #a5b4fc;
+}
+.admin-dropdown-item.users {
+  color: #86efac;
+}
+.admin-dropdown-item.analytics {
+  color: #fca5a5;
+}
+
+/* Section dividers */
+.dropdown-section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(109, 40, 217, 0.3) 50%, 
+    rgba(255,255,255,0) 100%);
+  margin: 8px 12px;
+}
+
+/* Active state */
+.admin-dropdown-item.active {
+  background: rgba(99, 102, 241, 0.25);
+  color: white;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-dropdown-item {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+  }
+  
+  .admin-dropdown-icon {
+    margin-right: 10px;
+    font-size: 1.1rem;
+  }
+  
+  .dropdown-section-header {
+    padding: 6px 12px;
+  }
+}
+
+/* Animation for dropdown items */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-dropdown-item {
+  animation: slideIn 0.2s ease-out forwards;
+  opacity: 0;
+}
+
+.admin-dropdown-item:nth-child(1) { animation-delay: 0.05s; }
+.admin-dropdown-item:nth-child(2) { animation-delay: 0.1s; }
+.admin-dropdown-item:nth-child(3) { animation-delay: 0.15s; }

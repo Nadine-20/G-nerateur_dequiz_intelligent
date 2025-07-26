@@ -14,6 +14,8 @@ from controllers.creationQuizController import create_quiz, init_quiz_controller
 from controllers.myQuizzesController import init_my_quizzes_controller, my_quizzes_bp
 from controllers.ai_quiz_controller import init_ai_quiz_controller, generate_quiz_with_ai
 from controllers.dashboardEnseignant import dashboard_teacher_bp, init_dashboard_teacher
+from controllers.admin_users_controller import init_user_routes
+from controllers.admin_quiz_controller import init_quiz_routes
 
 
 load_dotenv()
@@ -44,6 +46,8 @@ if not openai_api_key:
     raise ValueError("OPENROUTER_API_KEY environment variable is not set.")
 init_ai_quiz_controller(mongo, openai_api_key)
 init_dashboard_teacher(mongo)
+init_user_routes(app, mongo)
+init_quiz_routes(app, mongo)
 
 # Enregistre blueprint pour apprenant dashboard API
 app.register_blueprint(apprenant_bp, url_prefix='/api/apprenant')
