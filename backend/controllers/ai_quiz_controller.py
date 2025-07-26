@@ -22,9 +22,9 @@ def init_ai_quiz_controller(mongo_instance, api_key):
     )
 
 def generate_quiz_with_ai():
-
     if request.method == "OPTIONS":
         return '', 204
+
     try:
         if ai_client is None:
             return jsonify({"error": "AI client not initialized"}), 500
@@ -35,8 +35,13 @@ def generate_quiz_with_ai():
             if not data.get(field):
                 return jsonify({"error": f"{field} is required"}), 400
 
-        # Improved prompt with strict formatting instructions
-        prompt = f"""You are a quiz generator. Create a {data.get('difficulty', 'medium')} difficulty quiz about {data['topic']}.
+        # Define default values
+        difficulty = data.get("difficulty", "débutant")
+        is_public = data.get("isPublic", True)
+        time_limit = data.get("timeLimit", 900)
+        max_score = data.get("maxScore", 100)
+
+        prompt = f"""You are a quiz generator. Create a {difficulty} difficulty quiz about {data['topic']}.
         Return ONLY valid JSON in this exact format (NO markdown, NO additional text):
         {{
             "title": "Quiz Title",
@@ -58,9 +63,8 @@ def generate_quiz_with_ai():
         )
 
         raw_content = response.choices[0].message.content
-        print(f"Raw AI Response: {raw_content}")  # Debugging
+        print(f"Raw AI Response: {raw_content}")
 
-        # Clean the response
         cleaned_content = re.sub(r'^```json|```$', '', raw_content, flags=re.MULTILINE).strip()
         
         try:
@@ -72,32 +76,42 @@ def generate_quiz_with_ai():
                 "received_content": raw_content
             }), 500
 
-        # Validate quiz structure
         if not all(key in quiz_data for key in ["title", "questions"]):
             return jsonify({
                 "error": "Invalid quiz format from AI",
                 "received_data": quiz_data
             }), 500
 
-        # Database operations
+        # Format the final quiz object
         quiz = {
-            **quiz_data,
+            "title": quiz_data["title"],
+            "description": quiz_data.get("description", ""),
             "createdBy": ObjectId(data["createdBy"]),
             "createdAt": datetime.utcnow(),
+            "isPublic": is_public,
             "subject": data["subject"],
-            "difficulty": data.get("difficulty", "medium"),
+            "topics": [],  # You can add logic to extract topics later if needed
+            "difficulty": difficulty,
+            "timeLimit": time_limit,
+            "maxScore": max_score,
+            "questions": quiz_data["questions"],
             "attempts": []
         }
-        
+
         result = quizzes.insert_one(quiz)
+
+        # Add the quiz to the user's custom quizzes list
         users.update_one(
             {"_id": ObjectId(data["createdBy"])},
             {"$push": {"customQuizzes": result.inserted_id}}
         )
 
+        # Return response
         return jsonify({
+            **quiz,
             "_id": str(result.inserted_id),
-            **quiz_data
+            "createdBy": str(quiz["createdBy"]),
+            "createdAt": quiz["createdAt"].isoformat()
         }), 201
 
     except Exception as e:
