@@ -3,8 +3,7 @@ from bson import ObjectId
 from datetime import datetime
 from openai import OpenAI
 import json
-import re  # Added for response cleaning
-
+import re  
 mongo = None
 quizzes = None
 users = None
@@ -82,7 +81,6 @@ def generate_quiz_with_ai():
                 "received_data": quiz_data
             }), 500
 
-        # Format the final quiz object
         quiz = {
             "title": quiz_data["title"],
             "description": quiz_data.get("description", ""),
@@ -90,7 +88,7 @@ def generate_quiz_with_ai():
             "createdAt": datetime.utcnow(),
             "isPublic": is_public,
             "subject": data["subject"],
-            "topics": [],  # You can add logic to extract topics later if needed
+            "topics": [], 
             "difficulty": difficulty,
             "timeLimit": time_limit,
             "maxScore": max_score,
@@ -100,13 +98,11 @@ def generate_quiz_with_ai():
 
         result = quizzes.insert_one(quiz)
 
-        # Add the quiz to the user's custom quizzes list
         users.update_one(
             {"_id": ObjectId(data["createdBy"])},
             {"$push": {"customQuizzes": result.inserted_id}}
         )
 
-        # Return response
         return jsonify({
             **quiz,
             "_id": str(result.inserted_id),

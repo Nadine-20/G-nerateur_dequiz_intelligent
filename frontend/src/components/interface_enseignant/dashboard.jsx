@@ -90,7 +90,7 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    {/* <Last_Activities_Table teacherId={teacherId} /> */}
+                    <Last_Activities_Table teacherId={teacherId} />
                 </section>
             </main>
         </div>
