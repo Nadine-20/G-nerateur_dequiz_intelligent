@@ -4,13 +4,13 @@ from datetime import datetime
 
 mongo = None
 quizzes = None
-users = None  # Add users collection reference
+users = None  
 
 def init_quiz_controller(mongo_instance):
     global mongo, quizzes, users
     mongo = mongo_instance
     quizzes = mongo.db["quizzes"]
-    users = mongo.db["users"]  # Initialize users collection
+    users = mongo.db["users"]  
 
 
 def create_quiz():
@@ -19,7 +19,6 @@ def create_quiz():
         if not data:
             return jsonify({"error": "Invalid JSON payload"}), 400
 
-        # Validate teacher ID as ObjectId string
         created_by_str = data.get("createdBy")
         if not created_by_str or not ObjectId.is_valid(created_by_str):
             return jsonify({
@@ -29,13 +28,11 @@ def create_quiz():
 
         teacher_id = ObjectId(created_by_str)
 
-        # Validate required fields
         required_fields = ["title", "subject", "questions"]
         for field in required_fields:
             if not data.get(field):
                 return jsonify({"error": f"{field} is required"}), 400
 
-        # Validate questions list
         if not isinstance(data["questions"], list) or len(data["questions"]) == 0:
             return jsonify({"error": "At least one question is required"}), 400
 
@@ -69,7 +66,6 @@ def create_quiz():
                 "message": "Quiz was created but couldn't find teacher to associate with"
             }), 404
 
-        # Prepare response: convert ObjectIds to strings
         quiz["_id"] = str(inserted_quiz_id)
         quiz["createdBy"] = str(teacher_id)
         quiz["createdAt"] = quiz["createdAt"].strftime("%Y-%m-%dT%H:%M:%SZ")
